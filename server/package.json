@@ -5,10 +5,13 @@
   "main": "server.js",
   "start": "node server.js",
   "dependencies": {
+    "bootstrap": "^4.4.1",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
     "nodemon": "^2.0.1",
+    "react-bootstrap": "^1.0.0-beta.16",
     "uuid": "^3.3.3"
   },
   "devDependencies": {},
