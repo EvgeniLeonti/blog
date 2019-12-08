@@ -24,7 +24,7 @@ function Home() {
                 <h2>Home</h2>
                 {data && data.allPosts && data.allPosts.map((post, index) => (
                     <div key={index} className="post-preview">
-                        <a href="post.html">
+                        <a href={"posts/" + post.id}>
                             <h2 className="post-title">
                                 {post.title}
                             </h2>
