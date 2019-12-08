@@ -15,7 +15,15 @@ adapter.create = (table, postObject) => {
 };
 
 adapter.read = (table, id) => {
-  return JSON.parse(fs.readFileSync(`${rootPath}/${table}/${id}.json`).toString());
+  if (id) {
+    return JSON.parse(fs.readFileSync(`${rootPath}/${table}/${id}.json`).toString());
+  }
+
+  let posts = [];
+  for (const file of fs.readdirSync(`${rootPath}/${table}`)) {
+    posts.push(JSON.parse(fs.readFileSync(`${rootPath}/${table}/${file}`).toString()));
+  }
+  return posts;
 };
 
 

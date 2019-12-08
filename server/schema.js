@@ -62,6 +62,14 @@ const Query = new GraphQLObjectType({
             resolve: function(source, {id}) {
                 return adapter.read("posts", id);
             }
+        },
+        allPosts: {
+            type: new GraphQLList(Post),
+            description: 'All posts',
+            resolve: function(source, {id}) {
+                let allPosts = adapter.read("posts");
+                return allPosts;
+            }
         }
     })
 });
