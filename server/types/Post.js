@@ -1,16 +1,5 @@
-const {commonAutoProps, queryFields, commonConstructor} = require("./utils");
-
-const {
-    GraphQLList,
-    GraphQLObjectType,
-    GraphQLSchema,
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLEnumType,
-    GraphQLNonNull,
-    GraphQLInterfaceType
-} = require('graphql');
+const { Entity } = require('./Entity');
+const { GraphQLString } = require('graphql');
 
 const manualProps = [
     {name: "title", type: GraphQLString, nonNullForMutation: true},
@@ -21,9 +10,9 @@ const manualProps = [
     {name: "content", type: GraphQLString, nonNullForMutation: true}
 ];
 
-class Post {
+class Post extends Entity{
     constructor(args) {
-        commonConstructor(Post, args, this);
+        super(args, manualProps);
 
         if (!this.summary) {
             this.summary = this.content.substring(0, 100);
@@ -31,10 +20,9 @@ class Post {
     }
 }
 
-Post.name = 'post';
-Post.pluralName = 'posts';
+Post.name = 'Post';
+Post.pluralName = 'Posts';
 Post.dbTable = 'posts';
 Post.manualProps = manualProps;
-Post.autoProps = commonAutoProps;
 
 exports.Post = Post;

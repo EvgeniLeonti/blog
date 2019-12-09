@@ -1,34 +1,20 @@
-const {commonAutoProps, queryFields, commonConstructor} = require("./utils");
-
-const {
-    GraphQLList,
-    GraphQLObjectType,
-    GraphQLSchema,
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLEnumType,
-    GraphQLNonNull,
-    GraphQLInterfaceType
-} = require('graphql');
+const { Entity } = require('./Entity');
+const { GraphQLString } = require('graphql');
 
 const manualProps = [
     {name: "name", type: GraphQLString, nonNullForMutation: true},
     {name: "email", type: GraphQLString, nonNullForMutation: true},
 ];
 
-
-class Author {
+class Author extends Entity{
     constructor(args) {
-        commonConstructor(Author, args, this);
+        super(args, manualProps);
     }
 }
 
-
-Author.name = 'author';
-Author.pluralName = 'authors';
+Author.name = 'Author';
+Author.pluralName = 'Authors';
 Author.dbTable = 'authors';
 Author.manualProps = manualProps;
-Author.autoProps = commonAutoProps;
 
 exports.Author = Author;

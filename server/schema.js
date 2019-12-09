@@ -1,5 +1,3 @@
-const {crudArgs, convertToGraphQLType} = require("./types/utils");
-
 const adapter = require("./adapters/fs").adapter;
 
 const {
@@ -26,50 +24,45 @@ const Category = new GraphQLEnumType({
 });
 
 
-const {Post, GraphQLPost} = require("./types/Post");
-const {Author, GraphQLAuthor} = require("./types/Author");
+const {Post} = require("./types/Post");
+const {Author} = require("./types/Author");
 
 let queryFields = {};
 let mutationFields = {};
 
-let entities = [
-    {type: Post, graphQLType: GraphQLPost},
-    {type: Author, graphQLType: GraphQLAuthor},
-];
+let entities = [Post, Author];
 
 for (const entity of entities) {
-    let type = entity.type;
-    let graphQLType = convertToGraphQLType(type);
-
+    let type = entity.convertToGraphQLType();
 
     // read
-    queryFields[type.name] = {
-        type: graphQLType, description: `Read ${type.name} by id`, args: crudArgs(type).read(),
-        resolve: (source, {id}) => adapter.read(type.dbTable, id)
+    queryFields[entity.name] = {
+        type: type, description: `Read ${entity.name} by id`, args: entity.readArgs(),
+        resolve: (source, {id}) => adapter.read(entity.dbTable, id)
     };
 
     // create
-    mutationFields[`create${type.name}`] = {
-        type: graphQLType, description: `Create new ${type.name}`, args: crudArgs(type).create(),
-        resolve: (source, {...args}) => adapter.create(type.dbTable, new type(args))
+    mutationFields[`create${entity.name}`] = {
+        type: type, description: `Create new ${entity.name}`, args: entity.createArgs(),
+        resolve: (source, {...args}) => adapter.create(entity.dbTable, new entity(args))
     };
 
     // update
-    mutationFields[`update${type.name}`] = {
-        type: graphQLType, description: `Update ${type.name} by id`, args: crudArgs(type).update(),
-        resolve: (source, {...args}) => adapter.update(type.dbTable, new type(args))
+    mutationFields[`update${entity.name}`] = {
+        type: type, description: `Update ${entity.name} by id`, args: entity.updateArgs(),
+        resolve: (source, {...args}) => adapter.update(entity.dbTable, new entity(args))
     };
 
     // delete
-    mutationFields[`delete${type.name}`] = {
-        type: graphQLType, description: `Delete ${type.name} by id`, args: crudArgs(type).delete(),
-        resolve: (source, {...args}) => adapter.delete(type.dbTable, args.id)
+    mutationFields[`delete${entity.name}`] = {
+        type: type, description: `Delete ${entity.name} by id`, args: entity.deleteArgs(),
+        resolve: (source, {...args}) => adapter.delete(entity.dbTable, args.id)
     };
 
     // read all
-    queryFields[`all${type.name}s`] = {
-        type: graphQLType, description: `Read all ${type.pluralName}`, args: crudArgs(type).read(),
-        resolve: (source, {id}) => adapter.read(type.dbTable)
+    queryFields[`all${entity.pluralName}`] = {
+        type: type, description: `Read all ${entity.pluralName}`, args: entity.readArgs(),
+        resolve: (source, {id}) => adapter.read(entity.dbTable)
     };
 }
 
