@@ -1,4 +1,6 @@
-const uuidv1 = require('uuid/v1');
+const autoProps = require("./utils").commonAutoProps;
+const queryFields = require("./utils").queryFields;
+
 const {
     GraphQLList,
     GraphQLObjectType,
@@ -16,22 +18,6 @@ const manualProps = [
     {name: "email", type: GraphQLString, nonNullForMutation: true},
 ];
 
-const autoProps = [
-    {name: "id", type: GraphQLString, value: () => uuidv1()},
-    {name: "createdAt", type: GraphQLString, value: () => (new Date()).toISOString()},
-    {name: "modifiedAt", type: GraphQLString, value: () => (new Date()).toISOString()}
-];
-
-const authorQueryFields = {};
-for (const prop of manualProps.concat(autoProps)) {
-    authorQueryFields[prop.name] = {type: prop.type};
-}
-
-const GraphQLAuthor = new GraphQLObjectType({
-    name: 'Author',
-    description: 'Represent the type of an author of a blog post or a comment',
-    fields: () => (authorQueryFields)
-});
 
 class Author {
     constructor(args) {
@@ -55,9 +41,8 @@ class Author {
     }
 }
 
-Author.dbTable = 'posts';
+Author.dbTable = 'authors';
 Author.manualProps = manualProps;
 Author.autoProps = autoProps;
 
 exports.Author = Author;
-exports.GraphQLAuthor = GraphQLAuthor;

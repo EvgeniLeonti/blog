@@ -10,8 +10,9 @@ const {
     GraphQLInterfaceType
 } = require('graphql');
 
+const uuidv1 = require('uuid/v1');
 
-let crudArgs = ((type) => {
+const crudArgs = ((type) => {
     let crud = {};
     crud.create = () => {
         let args = {};
@@ -60,4 +61,28 @@ let crudArgs = ((type) => {
     return crud;
 });
 
+const convertToGraphQLType = ((type) => {
+    const queryFields = {};
+    for (const prop of type.manualProps.concat(type.autoProps)) {
+        queryFields[prop.name] = {type: prop.type};
+    }
+
+    return new GraphQLObjectType({
+        name: type.name,
+        description: `Represent the type of a ${type.name}`,
+        fields: () => (queryFields)
+    });
+});
+
+
+const commonAutoProps = [
+    {name: "id", type: GraphQLString, value: () => uuidv1()},
+    {name: "createdAt", type: GraphQLString, value: () => (new Date()).toISOString()},
+    {name: "modifiedAt", type: GraphQLString, value: () => (new Date()).toISOString()}
+];
+
+
+
 exports.crudArgs = crudArgs;
+exports.commonAutoProps = commonAutoProps;
+exports.convertToGraphQLType = convertToGraphQLType;

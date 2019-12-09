@@ -1,4 +1,5 @@
-const uuidv1 = require('uuid/v1');
+const autoProps = require("./utils").commonAutoProps;
+
 const {
     GraphQLList,
     GraphQLObjectType,
@@ -19,23 +20,6 @@ const manualProps = [
     {name: "summary", type: GraphQLString, nonNullForMutation: false},
     {name: "content", type: GraphQLString, nonNullForMutation: true}
 ];
-
-const autoProps = [
-    {name: "id", type: GraphQLString, value: () => uuidv1()},
-    {name: "createdAt", type: GraphQLString, value: () => (new Date()).toISOString()},
-    {name: "modifiedAt", type: GraphQLString, value: () => (new Date()).toISOString()}
-];
-
-const postQueryFields = {};
-for (const prop of manualProps.concat(autoProps)) {
-    postQueryFields[prop.name] = {type: prop.type};
-}
-
-const GraphQLPost = new GraphQLObjectType({
-    name: 'Post',
-    description: 'Represent the type of a blog post',
-    fields: () => (postQueryFields)
-});
 
 class Post {
     constructor(args) {
@@ -68,4 +52,3 @@ Post.manualProps = manualProps;
 Post.autoProps = autoProps;
 
 exports.Post = Post;
-exports.GraphQLPost = GraphQLPost;

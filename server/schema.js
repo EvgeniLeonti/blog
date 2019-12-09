@@ -1,4 +1,4 @@
-const {crudArgs} = require("./types/utils");
+const {crudArgs, convertToGraphQLType} = require("./types/utils");
 
 const adapter = require("./adapters/fs").adapter;
 
@@ -39,12 +39,12 @@ let entities = [
 
 for (const entity of entities) {
     let type = entity.type;
-    let graphQLType = entity.graphQLType;
+    let graphQLType = convertToGraphQLType(type);
 
 
     // read
     queryFields[type.name] = {
-        type: GraphQLPost, description: `Read ${type.name} by id`, args: crudArgs(type).read(),
+        type: graphQLType, description: `Read ${type.name} by id`, args: crudArgs(type).read(),
         resolve: (source, {id}) => adapter.read(type.dbTable, id)
     };
 
@@ -67,8 +67,8 @@ for (const entity of entities) {
     };
 
     // read all
-    queryFields[type.name] = {
-        type: graphQLType, description: `Read all ${type.name}`, args: crudArgs(type).read(),
+    queryFields[`all${type.name}s`] = {
+        type: graphQLType, description: `Read all ${type.name}s`, args: crudArgs(type).read(),
         resolve: (source, {id}) => adapter.read(type.dbTable)
     };
 }
