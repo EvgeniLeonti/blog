@@ -6,7 +6,7 @@ import Header from "./Header";
 const GET_ALL_POSTS = gql`
     query {
       allPosts {
-        id title timestamp summary content
+        id title createdAt summary content
       }
     }
 `;
@@ -34,7 +34,7 @@ function Home() {
                                 {post.summary}
                             </h3>
                         </a>
-                        <p className="post-meta">Posted by <a href="#">Start Bootstrap</a> on {post.timestamp}</p>
+                        <p className="post-meta">Posted by <a href="#">Start Bootstrap</a> on {post.createdAt}</p>
                     </div>
                 ))}
             </div>

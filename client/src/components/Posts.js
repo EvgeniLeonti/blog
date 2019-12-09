@@ -47,7 +47,7 @@ function Post() {
     const GET_POST = gql`
     query {
       post(id: "${postId}") {
-        id title timestamp summary content
+        id title createdAt summary content
       }
     }
     `;

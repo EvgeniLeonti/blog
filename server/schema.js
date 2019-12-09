@@ -30,28 +30,38 @@ const Author = new GraphQLObjectType({
     fields: () => ({
         id: {type: GraphQLString},
         name: {type: GraphQLString},
-        twitterHandle: {type: GraphQLString}
     })
 });
 
-const postFields = {
+const postQueryFields = {
     id: {type: GraphQLString},
+    createdAt: {type: GraphQLString},
+    modifiedAt: {type: GraphQLString},
+
     title: {type: GraphQLString},
     subtitle: {type: GraphQLString},
-    author: {type: GraphQLString},
+    author: {type: Author},
     category: {type: Category},
     summary: {type: GraphQLString},
     content: {type: GraphQLString},
-    timestamp: {type: GraphQLString},
+};
+
+const postMutationArgs = {
+    title: {type: new GraphQLNonNull(GraphQLString)},
+    subtitle: {type: GraphQLString},
+    author: {type: new GraphQLNonNull(GraphQLString), description: 'Id of the author'},
+    category: {type: Category},
+    summary: {type: GraphQLString},
+    content: {type: new GraphQLNonNull(GraphQLString)},
 };
 
 const Post = new GraphQLObjectType({
     name: 'Post',
     description: 'Represent the type of a blog post',
-    fields: () => (postFields)
+    fields: () => (postQueryFields)
 });
 
-// delete postFields.id;
+// delete postQueryFields.id;
 
 const Schema = new GraphQLSchema({
     query: new GraphQLObjectType({
@@ -84,7 +94,7 @@ const Schema = new GraphQLSchema({
             createPost: {
                 type: Post,
                 description: 'Create a new blog post',
-                args: postFields,
+                args: postMutationArgs,
                 resolve: function(source, {...args}) {
                     let postObject = args;
                     postObject.id = uuidv1();
@@ -93,7 +103,7 @@ const Schema = new GraphQLSchema({
                         postObject.summary = postObject.content.substring(0, 100);
                     }
 
-                    postObject.timestamp = (new Date()).toISOString();
+                    postObject.createdAt = (new Date()).toISOString();
 
                     let storedInDB = adapter.create("posts", postObject);
 
