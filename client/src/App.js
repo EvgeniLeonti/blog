@@ -2,12 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 import Home from './components/Home';
+import Header from './components/Header';
 import Contact from './components/Contact';
 import Posts from './components/Posts';
 
 function App() {
   return (
       <React.Fragment>
+          <Header></Header>
           <Router>
               <nav className="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
                   <div className="container">
@@ -36,8 +38,6 @@ function App() {
 
 
           </Router>
-
-
 
       </React.Fragment>
   );
