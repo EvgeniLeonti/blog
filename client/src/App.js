@@ -9,7 +9,6 @@ import Posts from './components/Posts';
 function App() {
   return (
       <React.Fragment>
-          <Header></Header>
           <Router>
               <nav className="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
                   <div className="container">

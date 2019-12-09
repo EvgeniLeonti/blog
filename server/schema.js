@@ -34,80 +34,74 @@ const Author = new GraphQLObjectType({
     })
 });
 
-
+const postFields = {
+    id: {type: GraphQLString},
+    title: {type: GraphQLString},
+    subtitle: {type: GraphQLString},
+    author: {type: GraphQLString},
+    category: {type: Category},
+    summary: {type: GraphQLString},
+    content: {type: GraphQLString},
+    timestamp: {type: GraphQLString},
+};
 
 const Post = new GraphQLObjectType({
     name: 'Post',
     description: 'Represent the type of a blog post',
-    fields: () => ({
-        id: {type: GraphQLString},
-        title: {type: GraphQLString},
-        category: {type: Category},
-        summary: {type: GraphQLString},
-        content: {type: GraphQLString},
-        timestamp: {type: GraphQLString},
-    })
+    fields: () => (postFields)
 });
 
-const Query = new GraphQLObjectType({
-    name: 'BlogSchema',
-    description: 'Root of the Blog Schema',
-    fields: () => ({
-        post: {
-            type: Post,
-            description: 'Post by id',
-            args: {
-                id: {type: new GraphQLNonNull(GraphQLString)}
-            },
-            resolve: function(source, {id}) {
-                return adapter.read("posts", id);
-            }
-        },
-        allPosts: {
-            type: new GraphQLList(Post),
-            description: 'All posts',
-            resolve: function(source, {id}) {
-                let allPosts = adapter.read("posts");
-                return allPosts;
-            }
-        }
-    })
-});
-
-const Mutation = new GraphQLObjectType({
-    name: 'BlogMutations',
-    fields: {
-        createPost: {
-            type: Post,
-            description: 'Create a new blog post',
-            args: {
-                title: {type: new GraphQLNonNull(GraphQLString)},
-                content: {type: new GraphQLNonNull(GraphQLString)},
-                summary: {type: GraphQLString},
-                category: {type: Category},
-                author: {type: new GraphQLNonNull(GraphQLString), description: 'Id of the author'}
-            },
-            resolve: function(source, {...args}) {
-                let postObject = args;
-                postObject.id = uuidv1();
-
-                if(!postObject.summary) {
-                    postObject.summary = postObject.content.substring(0, 100);
-                }
-
-                postObject.timestamp = (new Date()).toISOString();
-
-                let storedInDB = adapter.create("posts", postObject);
-
-                return storedInDB;
-            }
-        }
-    }
-});
+// delete postFields.id;
 
 const Schema = new GraphQLSchema({
-    query: Query,
-    mutation: Mutation
+    query: new GraphQLObjectType({
+        name: 'BlogSchema',
+        description: 'Root of the Blog Schema',
+        fields: () => ({
+            post: {
+                type: Post,
+                description: 'Post by id',
+                args: {
+                    id: {type: new GraphQLNonNull(GraphQLString)}
+                },
+                resolve: function(source, {id}) {
+                    return adapter.read("posts", id);
+                }
+            },
+            allPosts: {
+                type: new GraphQLList(Post),
+                description: 'All posts',
+                resolve: function(source, {id}) {
+                    let allPosts = adapter.read("posts");
+                    return allPosts;
+                }
+            }
+        })
+    }),
+    mutation: new GraphQLObjectType({
+        name: 'BlogMutations',
+        fields: {
+            createPost: {
+                type: Post,
+                description: 'Create a new blog post',
+                args: postFields,
+                resolve: function(source, {...args}) {
+                    let postObject = args;
+                    postObject.id = uuidv1();
+
+                    if(!postObject.summary) {
+                        postObject.summary = postObject.content.substring(0, 100);
+                    }
+
+                    postObject.timestamp = (new Date()).toISOString();
+
+                    let storedInDB = adapter.create("posts", postObject);
+
+                    return storedInDB;
+                }
+            }
+        }
+    })
 });
 
 exports.Schema = Schema;

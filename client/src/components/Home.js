@@ -1,6 +1,7 @@
 import React from 'react';
 import {useQuery} from '@apollo/react-hooks';
 import gql from "graphql-tag";
+import Header from "./Header";
 
 const GET_ALL_POSTS = gql`
     query {
@@ -20,6 +21,7 @@ function Home() {
 
     return (
         <React.Fragment>
+            <Header title="Clean Blog" type="site-heading"/>
             <div className="col-lg-8 col-md-10 mx-auto">
                 <h2>Home</h2>
                 {data && data.allPosts && data.allPosts.map((post, index) => (

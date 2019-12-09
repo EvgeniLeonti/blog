@@ -3,6 +3,7 @@ import React from "react";
 import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
 import gql from "graphql-tag";
 import {useQuery} from "@apollo/react-hooks";
+import Header from "./Header";
 
 
 
@@ -63,10 +64,12 @@ function Post() {
     let post = data.post;
 
     return (
-        <div className="col-lg-8 col-md-10 mx-auto">
-            <h1>{post.title}</h1>
-            {post.content}
-        </div>
+        <React.Fragment>
+            <Header title={post.title} type="post-heading"/>
+            <div className="col-lg-8 col-md-10 mx-auto">
+                {post.content}
+            </div>
+        </React.Fragment>
     );
 }
 
