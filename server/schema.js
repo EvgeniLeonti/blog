@@ -1,5 +1,6 @@
+const {crudArgs} = require("./types/utils");
+
 const adapter = require("./adapters/fs").adapter;
-const uuidv1 = require('uuid/v1');
 
 const {
     GraphQLList,
@@ -24,93 +25,64 @@ const Category = new GraphQLEnumType({
     }
 });
 
-const Author = new GraphQLObjectType({
-    name: 'Author',
-    description: 'Represent the type of an author of a blog post or a comment',
-    fields: () => ({
-        id: {type: GraphQLString},
-        name: {type: GraphQLString},
-    })
-});
 
-const postQueryFields = {
-    id: {type: GraphQLString},
-    createdAt: {type: GraphQLString},
-    modifiedAt: {type: GraphQLString},
+const {Post, GraphQLPost} = require("./types/Post");
+const {Author, GraphQLAuthor} = require("./types/Author");
 
-    title: {type: GraphQLString},
-    subtitle: {type: GraphQLString},
-    author: {type: Author},
-    category: {type: Category},
-    summary: {type: GraphQLString},
-    content: {type: GraphQLString},
-};
+let queryFields = {};
+let mutationFields = {};
 
-const postMutationArgs = {
-    title: {type: new GraphQLNonNull(GraphQLString)},
-    subtitle: {type: GraphQLString},
-    author: {type: new GraphQLNonNull(GraphQLString), description: 'Id of the author'},
-    category: {type: Category},
-    summary: {type: GraphQLString},
-    content: {type: new GraphQLNonNull(GraphQLString)},
-};
+let entities = [
+    {type: Post, graphQLType: GraphQLPost},
+    {type: Author, graphQLType: GraphQLAuthor},
+];
 
-const Post = new GraphQLObjectType({
-    name: 'Post',
-    description: 'Represent the type of a blog post',
-    fields: () => (postQueryFields)
-});
+for (const entity of entities) {
+    let type = entity.type;
+    let graphQLType = entity.graphQLType;
 
-// delete postQueryFields.id;
+
+    // read
+    queryFields[type.name] = {
+        type: GraphQLPost, description: `Read ${type.name} by id`, args: crudArgs(type).read(),
+        resolve: (source, {id}) => adapter.read(type.dbTable, id)
+    };
+
+    // create
+    mutationFields[`create${type.name}`] = {
+        type: graphQLType, description: `Create new ${type.name}`, args: crudArgs(type).create(),
+        resolve: (source, {...args}) => adapter.create(type.dbTable, new type(args))
+    };
+
+    // update
+    mutationFields[`update${type.name}`] = {
+        type: graphQLType, description: `Update ${type.name} by id`, args: crudArgs(type).update(),
+        resolve: (source, {...args}) => adapter.update(type.dbTable, new type(args))
+    };
+
+    // delete
+    mutationFields[`delete${type.name}`] = {
+        type: graphQLType, description: `Delete ${type.name} by id`, args: crudArgs(type).delete(),
+        resolve: (source, {...args}) => adapter.delete(type.dbTable, args.id)
+    };
+
+    // read all
+    queryFields[type.name] = {
+        type: graphQLType, description: `Read all ${type.name}`, args: crudArgs(type).read(),
+        resolve: (source, {id}) => adapter.read(type.dbTable)
+    };
+}
 
 const Schema = new GraphQLSchema({
     query: new GraphQLObjectType({
         name: 'BlogSchema',
         description: 'Root of the Blog Schema',
-        fields: () => ({
-            post: {
-                type: Post,
-                description: 'Post by id',
-                args: {
-                    id: {type: new GraphQLNonNull(GraphQLString)}
-                },
-                resolve: function(source, {id}) {
-                    return adapter.read("posts", id);
-                }
-            },
-            allPosts: {
-                type: new GraphQLList(Post),
-                description: 'All posts',
-                resolve: function(source, {id}) {
-                    let allPosts = adapter.read("posts");
-                    return allPosts;
-                }
-            }
-        })
+        fields: queryFields
     }),
     mutation: new GraphQLObjectType({
         name: 'BlogMutations',
-        fields: {
-            createPost: {
-                type: Post,
-                description: 'Create a new blog post',
-                args: postMutationArgs,
-                resolve: function(source, {...args}) {
-                    let postObject = args;
-                    postObject.id = uuidv1();
+        fields: mutationFields
 
-                    if(!postObject.summary) {
-                        postObject.summary = postObject.content.substring(0, 100);
-                    }
-
-                    postObject.createdAt = (new Date()).toISOString();
-
-                    let storedInDB = adapter.create("posts", postObject);
-
-                    return storedInDB;
-                }
-            }
-        }
     })
 });
 
