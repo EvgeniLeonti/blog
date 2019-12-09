@@ -12,18 +12,6 @@ const {
     GraphQLInterfaceType
 } = require('graphql');
 
-const Category = new GraphQLEnumType({
-    name: 'Category',
-    description: 'A Category of the blog',
-    values: {
-        METEOR: {value: 'meteor'},
-        PRODUCT: {value: 'product'},
-        USER_STORY: {value: 'user-story'},
-        OTHER: {value: 'other'}
-    }
-});
-
-
 const {Post} = require("./types/Post");
 const {Author} = require("./types/Author");
 
@@ -61,7 +49,7 @@ for (const entity of entities) {
 
     // read all
     queryFields[`all${entity.pluralName}`] = {
-        type: type, description: `Read all ${entity.pluralName}`, args: entity.readArgs(),
+        type: new GraphQLList(type), description: `Read all ${entity.pluralName}`, args: entity.readAllArgs(),
         resolve: (source, {id}) => adapter.read(entity.dbTable)
     };
 }

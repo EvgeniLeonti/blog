@@ -113,6 +113,12 @@ class Entity {
         };
         return args;
     }
+
+    static readAllArgs() {
+        // no args for this
+        let args = {};
+        return args;
+    }
 }
 
 Entity.autoProps = autoProps;
