@@ -41,6 +41,9 @@ class Author {
     }
 }
 
+
+Author.name = 'author';
+Author.pluralName = 'authors';
 Author.dbTable = 'authors';
 Author.manualProps = manualProps;
 Author.autoProps = autoProps;

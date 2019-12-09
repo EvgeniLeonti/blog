@@ -47,6 +47,7 @@ class Post {
 }
 
 Post.name = 'post';
+Post.pluralName = 'posts';
 Post.dbTable = 'posts';
 Post.manualProps = manualProps;
 Post.autoProps = autoProps;

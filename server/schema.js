@@ -68,7 +68,7 @@ for (const entity of entities) {
 
     // read all
     queryFields[`all${type.name}s`] = {
-        type: graphQLType, description: `Read all ${type.name}s`, args: crudArgs(type).read(),
+        type: graphQLType, description: `Read all ${type.pluralName}`, args: crudArgs(type).read(),
         resolve: (source, {id}) => adapter.read(type.dbTable)
     };
 }
