@@ -1,16 +1,6 @@
 const uuidv1 = require('uuid/v1');
 
-const {
-    GraphQLList,
-    GraphQLObjectType,
-    GraphQLSchema,
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLEnumType,
-    GraphQLNonNull,
-    GraphQLInterfaceType
-} = require('graphql');
+const {GraphQLObjectType, GraphQLString, GraphQLNonNull} = require('graphql');
 
 const autoProps = [
     {name: "id", type: GraphQLString, value: () => uuidv1()},
@@ -39,6 +29,7 @@ class Entity {
         this.modifiedAt = autoProps.find(prop => prop.name === "modifiedAt").value();
     }
 
+    // Convert Entity object to GraphQLObjectType
     static convertToGraphQLType() {
         if (!this.graphQLType) {
             const queryFields = {};
@@ -59,6 +50,7 @@ class Entity {
         return this.graphQLType;
     }
 
+
     // CRUD Args for GraphQL Schema
 
     static createArgs() {
@@ -67,7 +59,7 @@ class Entity {
             let propType = prop.type;
             let propName = prop.name;
 
-            // convert custom types (like Author etc') to string - to mutate by id
+            // convert custom entities (like Author etc') to string - to mutate by id
             if (prop.convertToStringForMutation) {
                 propType = GraphQLString;
                 propName = `${prop.name}Id`;

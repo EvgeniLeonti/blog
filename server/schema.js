@@ -1,19 +1,7 @@
-const adapter = require("./adapters/fs").adapter;
-
-const {
-    GraphQLList,
-    GraphQLObjectType,
-    GraphQLSchema,
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLEnumType,
-    GraphQLNonNull,
-    GraphQLInterfaceType
-} = require('graphql');
-
-const {Post} = require("./types/Post");
-const {Author} = require("./types/Author");
+const {adapter} = require("./adapters/fs");
+const {GraphQLList, GraphQLObjectType, GraphQLSchema} = require('graphql');
+const {Post} = require("./entities/Post");
+const {Author} = require("./entities/Author");
 
 let queryFields = {};
 let mutationFields = {};
