@@ -16,7 +16,7 @@ class Header extends Component {
             heading = <div className="post-heading">
                 <h1>{this.props.title}</h1>
                 <h2 className="subheading">{this.props.subtitle}</h2>
-                <span className="meta">Posted by <a href="#">Start Bootstrap</a> on August 24, 2019</span>
+                <span className="meta">Posted by <a href="#">Start Bootstrap</a> on {(new Date).toDateString()}</span>
             </div>
         }
 

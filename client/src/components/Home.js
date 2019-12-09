@@ -2,6 +2,7 @@ import React from 'react';
 import {useQuery} from '@apollo/react-hooks';
 import gql from "graphql-tag";
 import Header from "./Header";
+import Page from "./Page";
 
 const GET_ALL_POSTS = gql`
     query {
@@ -14,16 +15,26 @@ const GET_ALL_POSTS = gql`
 function Home() {
     const {data, loading, error} = useQuery(GET_ALL_POSTS);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error</p>;
+    if (loading) return (
+        <React.Fragment>
+            <Header title="Clean Blog" type="site-heading"/>
+            <Page title="Loading..."><p>Please wait</p></Page>
+        </React.Fragment>
+    );
+
+    if (error) return (
+        <React.Fragment>
+            <Header title="Clean Blog" type="site-heading"/>
+            <Page title="Error"><p>{error.message}</p></Page>
+        </React.Fragment>
+    );
 
     console.log(data);
 
     return (
         <React.Fragment>
             <Header title="Clean Blog" type="site-heading"/>
-            <div className="col-lg-8 col-md-10 mx-auto">
-                <h2>Home</h2>
+            <Page title="Home">
                 {data && data.allPosts && data.allPosts.map((post, index) => (
                     <div key={index} className="post-preview">
                         <a href={"posts/" + post.id}>
@@ -37,7 +48,8 @@ function Home() {
                         <p className="post-meta">Posted by <a href="#">Start Bootstrap</a> on {post.createdAt}</p>
                     </div>
                 ))}
-            </div>
+            </Page>
+
         </React.Fragment>
     );
 }

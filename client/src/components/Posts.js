@@ -4,7 +4,7 @@ import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
 import gql from "graphql-tag";
 import {useQuery} from "@apollo/react-hooks";
 import Header from "./Header";
-
+import Page from "./Page";
 
 
 function Posts() {
@@ -45,30 +45,40 @@ function Post() {
     let { postId } = useParams();
 
     const GET_POST = gql`
-    query {
-      post(id: "${postId}") {
-        id title createdAt summary content
-      }
-    }
+        query {
+          Post(id: "${postId}") {
+            id title subtitle author {id name} createdAt summary content
+          }
+        }
     `;
-
-
 
     const {data, loading, error} = useQuery(GET_POST);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error</p>;
+    if (loading) return (
+        <React.Fragment>
+            <Header title="Clean Blog" type="site-heading"/>
+            <Page title="Loading..."><p>Please wait</p></Page>
+        </React.Fragment>
+    );
+
+    if (error) return (
+        <React.Fragment>
+            <Header title="Clean Blog" type="site-heading"/>
+            <Page title="Error"><p>{error.message}</p></Page>
+        </React.Fragment>
+    );
 
     console.log(data);
 
-    let post = data.post;
+    let post = data.Post;
 
     return (
         <React.Fragment>
-            <Header title={post.title} type="post-heading"/>
-            <div className="col-lg-8 col-md-10 mx-auto">
+            <Header title={post.title} subtitle={post.subtitle} createdAt={post.createdAt} type="post-heading"/>
+            <Page>
                 {post.content}
-            </div>
+            </Page>
+
         </React.Fragment>
     );
 }
