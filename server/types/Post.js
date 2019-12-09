@@ -1,10 +1,11 @@
 const { Entity } = require('./Entity');
+const { Author } = require('./Author');
 const { GraphQLString } = require('graphql');
 
 const manualProps = [
     {name: "title", type: GraphQLString, nonNullForMutation: true},
     {name: "subtitle", type: GraphQLString, nonNullForMutation: false},
-    // {name: "author", type: GraphQLString, nonNullForMutation: true},
+    {name: "author", type: Author.convertToGraphQLType(), nonNullForMutation: true, convertToStringForMutation: true},
     {name: "category", type: GraphQLString, nonNullForMutation: false},
     {name: "summary", type: GraphQLString, nonNullForMutation: false},
     {name: "content", type: GraphQLString, nonNullForMutation: true}

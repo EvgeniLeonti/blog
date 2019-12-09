@@ -40,29 +40,44 @@ class Entity {
     }
 
     static convertToGraphQLType() {
-        const queryFields = {};
-        for (const prop of this.manualProps.concat(this.autoProps)) {
-            queryFields[prop.name] = {type: prop.type};
+        if (!this.graphQLType) {
+            const queryFields = {};
+            for (const prop of this.manualProps.concat(this.autoProps)) {
+                queryFields[prop.name] = {type: prop.type};
+            }
+
+            let graphQLType = new GraphQLObjectType({
+                name: this.name,
+                description: `Represent the type of ${this.name}`,
+                fields: () => (queryFields)
+            });
+
+
+            this.graphQLType = graphQLType;
         }
 
-        let graphQLType = new GraphQLObjectType({
-            name: this.name,
-            description: `Represent the type of a ${this.name}`,
-            fields: () => (queryFields)
-        });
-
-        return graphQLType;
+        return this.graphQLType;
     }
 
     // CRUD Args for GraphQL Schema
+
     static createArgs() {
         let args = {};
         for (const prop of this.manualProps) {
+            let propType = prop.type;
+            let propName = prop.name;
+
+            // convert custom types (like Author etc') to string - to mutate by id
+            if (prop.convertToStringForMutation) {
+                propType = GraphQLString;
+                propName = `${prop.name}Id`;
+            }
+
             if (prop.nonNullForMutation) {
-                args[prop.name] = {type: new GraphQLNonNull(prop.type)};
+                args[propName] = {type: new GraphQLNonNull(propType)};
             }
             else {
-                args[prop.name] = {type: prop.type};
+                args[propName] = {type: propType};
             }
         }
         return args;
