@@ -5,6 +5,7 @@ import Home from './components/Home';
 import Header from './components/Header';
 import Contact from './components/Contact';
 import Posts from './components/Posts';
+import Create from './components/Create';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
                       <div className="collapse navbar-collapse" id="navbarResponsive">
                           <ul className="navbar-nav ml-auto">
                               <li className="nav-item"><Link to={'/'} className="nav-link"> Home </Link></li>
+                              <li className="nav-item"><Link to={'/create'} className="nav-link"> Create </Link></li>
                               <li className="nav-item"><Link to={'/contact'} className="nav-link"> Contact </Link></li>
 
                           </ul>
@@ -31,6 +33,7 @@ function App() {
 
               <Switch>
                   <Route exact path='/' component={Home} />
+                  <Route path='/create' component={Create} />
                   <Route path='/contact' component={Contact} />
                   <Route path="/posts" component={Posts} />
               </Switch>
