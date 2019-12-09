@@ -81,8 +81,28 @@ const commonAutoProps = [
     {name: "modifiedAt", type: GraphQLString, value: () => (new Date()).toISOString()}
 ];
 
+const commonConstructor = (type, args, thisObj) => {
+    // manual props
+    for (const prop of type.manualProps) {
+        thisObj[prop.name] = args[prop.name];
+    }
+
+    // auto props - if not already exist
+    for (const prop of type.autoProps) {
+        if (!args[prop.name]) {
+            thisObj[prop.name] = prop.value();
+        }
+        else {
+            thisObj[prop.name] = args[prop.name];
+        }
+    }
+
+    // always update modifiedAt prop
+    this.modifiedAt = type.autoProps.find(prop => prop.name === "modifiedAt").value();
+};
 
 
 exports.crudArgs = crudArgs;
 exports.commonAutoProps = commonAutoProps;
+exports.commonConstructor = commonConstructor;
 exports.convertToGraphQLType = convertToGraphQLType;

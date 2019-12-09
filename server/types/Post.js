@@ -1,4 +1,4 @@
-const autoProps = require("./utils").commonAutoProps;
+const {commonAutoProps, queryFields, commonConstructor} = require("./utils");
 
 const {
     GraphQLList,
@@ -23,26 +23,11 @@ const manualProps = [
 
 class Post {
     constructor(args) {
-        // manual props
-        for (const prop of manualProps) {
-            this[prop.name] = args[prop.name];
-        }
+        commonConstructor(Post, args, this);
+
         if (!this.summary) {
             this.summary = this.content.substring(0, 100);
         }
-
-        // auto props - if not already exist
-        for (const prop of autoProps) {
-            if (!args[prop.name]) {
-                this[prop.name] = prop.value();
-            }
-            else {
-                this[prop.name] = args[prop.name];
-            }
-        }
-
-        // always update modifiedAt prop
-        this.modifiedAt = autoProps.find(prop => prop.name === "modifiedAt").value();
     }
 }
 
@@ -50,6 +35,6 @@ Post.name = 'post';
 Post.pluralName = 'posts';
 Post.dbTable = 'posts';
 Post.manualProps = manualProps;
-Post.autoProps = autoProps;
+Post.autoProps = commonAutoProps;
 
 exports.Post = Post;
