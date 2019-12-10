@@ -18,7 +18,15 @@ const PostTable = props => (
                     <td>{post.title}</td>
                     <td>{post.content}</td>
                     <td>
-                        <button className="button muted-button">Edit</button>
+                        <button
+                            onClick={() => {
+                                props.editRow(post)
+                            }}
+                            className="button muted-button"
+                        >
+                            Edit
+                        </button>
+
                         <button onClick={() => props.deletePost({ variables: {
                                 id: post.id
                             } })} className="button muted-button">

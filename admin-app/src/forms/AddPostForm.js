@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 const AddPostForm = props => {
     let title, content;
+
     return (
         <form onSubmit={e => {
             e.preventDefault();
