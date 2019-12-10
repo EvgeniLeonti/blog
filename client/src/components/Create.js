@@ -7,15 +7,35 @@ import gql from "graphql-tag";
 const CREATE_POST = gql`
     mutation CreatePost($authorId: String!, $title: String!, $content: String!) {
       createPost(authorId: $authorId, title: $title, content: $content) {
-        id title
+        id title summary content createdAt
       }
     }
 `;
 
+const GET_ALL_POSTS = gql`
+    query {
+        allPosts {
+            id title createdAt summary content
+        }
+    }
+`;
 
 function Create() {
     let authorId, title, content;
-    const [createPost, { data, loading, error }] = useMutation(CREATE_POST);
+    const [createPost, { data, loading, error }] = useMutation(CREATE_POST, {
+        update(cache, {data: { createPost }}) {
+            const data = cache.readQuery({query: GET_ALL_POSTS});
+            console.log("posts is:");
+            console.log(data);
+
+            console.log("createPost result:");
+            console.log(createPost);
+            cache.writeQuery({
+                query: GET_ALL_POSTS,
+                data: { allPosts: data.allPosts.concat([createPost])}
+            })
+        }
+    });
 
 
     if (loading) return (
@@ -40,12 +60,14 @@ function Create() {
                 <p>Create a new post.</p>
                 <form name="sentMessage" id="contactForm" noValidate="" onSubmit={e => {
                     e.preventDefault();
-                    alert("authorId: " + authorId.value);
+
                     createPost({ variables: {
                             authorId: authorId.value,
                             title: title.value,
                             content: content.value,
                     } });
+
+                    window.location.href = "../";
                 }}>
                     <div className="control-group">
                         <div className="form-group floating-label-form-group controls">

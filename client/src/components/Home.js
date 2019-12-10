@@ -13,6 +13,8 @@ const GET_ALL_POSTS = gql`
 `;
 
 function Home() {
+    // useQuery is a hook
+    // Hooks are functions that let you “hook into” React state and lifecycle features from function components.
     const {data, loading, error} = useQuery(GET_ALL_POSTS);
 
     if (loading) return (
@@ -57,7 +59,7 @@ function Home() {
                                     {post.summary}
                                 </h3>
                             </a>
-                            <p className="post-meta">Posted by <a href="#">Start Bootstrap</a> on {post.createdAt}</p>
+                            <p className="post-meta">Posted by <a href="#">{post.summary}</a> on {post.createdAt}</p>
                         </div>
                     ))}
                 </Page>
