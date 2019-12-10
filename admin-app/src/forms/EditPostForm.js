@@ -27,12 +27,14 @@ const EditPostForm = props => {
                 } });
 
         }}>
-            <label>ID</label>
-            <input type="text" name="id" value={currentPost.id} onChange={handleInputChange} ref={node => {id = node;}} />
+
             <label>Title</label>
             <input type="text" name="title" value={currentPost.title} onChange={handleInputChange} ref={node => {title = node;}} />
             <label>Content</label>
             <input type="text" name="content" value={currentPost.content} onChange={handleInputChange} ref={node => {content = node;}} />
+
+            <input type="hidden" name="id" value={currentPost.id} onChange={handleInputChange} ref={node => {id = node;}} />
+
             <button>Update post</button>
             <button onClick={() => props.setEditing(false)} className="button muted-button">
                 Cancel
