@@ -7,6 +7,22 @@ const ERROR = {
 };
 let adapter = {};
 
+adapter.init = () => {
+  if (!fs.existsSync(rootPath)) {
+    fs.mkdirSync(`${rootPath}`);
+    fs.mkdirSync(`${rootPath}/authors`);
+    fs.mkdirSync(`${rootPath}/posts`);
+  }
+  else {
+    if (!fs.existsSync(`${rootPath}/authors`)) {
+      fs.mkdirSync(`${rootPath}/authors`);
+    }
+    if (!fs.existsSync(`${rootPath}/posts`)) {
+      fs.mkdirSync(`${rootPath}/posts`);
+    }
+  }
+};
+
 adapter.create = (table, postObject) => {
   // todo validate postObject.id
   let filePath = `${rootPath}/${table}/${postObject.id}.json`;

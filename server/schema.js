@@ -3,6 +3,8 @@ const {GraphQLList, GraphQLObjectType, GraphQLSchema} = require('graphql');
 const {Post} = require("./entities/Post");
 const {Author} = require("./entities/Author");
 
+adapter.init();
+
 let queryFields = {};
 let mutationFields = {};
 
