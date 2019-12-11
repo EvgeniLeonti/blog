@@ -8,10 +8,10 @@ let queryFields = {};
 let mutationFields = {};
 
 let entities = fs.readdirSync(`./entities`)
-    .map(fileName => fileName.split(".")[0]) // remove the .js extenstion from filename
+    .map(fileName => fileName.split(".")[0]) // remove the .js extension from filename
     .filter(className => className !== "Entity") // ignore the abstract class Entity
     .map(className => require(`./entities/${className}.js`)[className]);
-
+// let entities = [require("./entities/Post").Post];
 for (const entity of entities) {
     let type = entity.convertToGraphQLType();
 

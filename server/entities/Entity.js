@@ -1,6 +1,6 @@
 const uuidv1 = require('uuid/v1');
 
-const {GraphQLObjectType, GraphQLString, GraphQLNonNull} = require('graphql');
+const {GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLEnumType, GraphQLInputObjectType} = require('graphql');
 
 const autoProps = [
     {name: "id", type: GraphQLString, value: () => uuidv1()},
@@ -54,6 +54,29 @@ class Entity {
 
         return this.graphQLType;
     }
+
+    // Convert Entity object to GraphQLObjectType representing SortParameter
+    static convertToGraphQLTypeSortParameter() {
+        if (!this.graphQLTypeSortParameter) {
+            const queryFields = {};
+            for (const prop of this.manualProps.concat(this.autoProps)) {
+                queryFields[prop.name] = {type: this.sortOrderType};
+            }
+
+            let graphQLType = new GraphQLInputObjectType({
+                name: `${this.name}SortParameter`,
+                description: `Represent the type of ${this.name}`,
+                fields: () => (queryFields)
+            });
+
+
+            this.graphQLTypeSortParameter = graphQLType;
+        }
+
+        return this.graphQLTypeSortParameter;
+    }
+
+
 
 
     // CRUD Args for GraphQL Schema
@@ -114,10 +137,23 @@ class Entity {
     static readAllArgs() {
         // no args for this
         let args = {};
+
+        args.sort = {
+            type: this.convertToGraphQLTypeSortParameter(),
+        };
+
         return args;
     }
 }
 
+// static values
 Entity.autoProps = autoProps;
+Entity.sortOrderType = new GraphQLEnumType({
+    name: "SortOrder",
+    values: {
+        ASC: { value: 0 },
+        DESC: { value: 1 },
+    }
+});
 
 exports.Entity = Entity;
