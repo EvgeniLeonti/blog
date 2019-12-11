@@ -10,6 +10,11 @@ const autoProps = [
 
 class Entity {
     constructor(args, manualProps) {
+        // Entity is an abstract class
+        if (new.target === Entity) {
+            throw new TypeError("Cannot construct Entity instances directly");
+        }
+
         // manual props
         for (const prop of manualProps) {
             this[prop.name] = args[prop.name];

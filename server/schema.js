@@ -1,14 +1,16 @@
 const {adapter} = require("./adapters/fs");
 const {GraphQLList, GraphQLObjectType, GraphQLSchema} = require('graphql');
-const {Post} = require("./entities/Post");
-const {Author} = require("./entities/Author");
+const fs = require('fs');
 
 adapter.init();
 
 let queryFields = {};
 let mutationFields = {};
 
-let entities = [Post, Author];
+let entities = fs.readdirSync(`./entities`)
+    .map(fileName => fileName.split(".")[0]) // remove the .js extenstion from filename
+    .filter(className => className !== "Entity") // ignore the abstract class Entity
+    .map(className => require(`./entities/${className}.js`)[className]);
 
 for (const entity of entities) {
     let type = entity.convertToGraphQLType();

@@ -2,8 +2,8 @@
   "name": "blog",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
-  "start": "node server.js",
+  "main": "GraphQLServer.js",
+  "start": "node GraphQLServer.js",
   "dependencies": {
     "bootstrap": "^4.4.1",
     "cors": "^2.8.5",
