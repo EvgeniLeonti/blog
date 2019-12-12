@@ -6,30 +6,23 @@ import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 function Crud(props) {
+    let schema = props.schema;
+    console.log(schema);
+
     let postFields = props.postFields;
+    let createPostArgs = props.createPostArgs;
     let types = props.types;
-
-    let fieldStr = ``;
-
-    for (const field of postFields) {
-        fieldStr += field.name;
-
-        let typeFields = types.find(type => type.name === field.type.name).fields;
-        if(typeFields) {
-            fieldStr += ` { ${typeFields.map(typeField => typeField.name).join(" ")} }`
-        }
-        fieldStr += ` `;
-    }
-
-    console.log(fieldStr);
 
     const GET_ALL_POSTS = gql`
         query {
             allPosts (sort: {createdAt: ASC, title: DESC}) {
-                ${fieldStr}
+                ${console.log(schema.Post)}
             }
         }
     `;
+
+    console.log("createPostArgs");
+    // console.log(getStr(createPostArgs));
 
     const CREATE_POST = gql`
         mutation CreatePost($authorId: String!, $title: String!, $content: String!) {
@@ -115,7 +108,7 @@ function Crud(props) {
                     ) : (
                         <div>
                             <h2>Add post</h2>
-                            <AddPostForm addPost={addPost} createPostFields={props.createPostFields}/>
+                            <AddPostForm addPost={addPost} createPostArgs={createPostArgs}/>
                         </div>
                     )}
                 </div>

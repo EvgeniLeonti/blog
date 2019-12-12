@@ -11,13 +11,17 @@ const AddPostForm = props => {
     return (
         <form onSubmit={e => {
             e.preventDefault();
+
+            console.log("onSubmit:");
+            console.log(currentPost);
+
             // todo debug
             currentPost.authorId = "test";
             props.addPost({ variables: currentPost });
 
         }}>
-                {props.createPostFields.length > 0 ? (
-                    props.createPostFields.map(field => (
+                {props.createPostArgs.length > 0 ? (
+                    props.createPostArgs.map(field => (
                         <React.Fragment>
                             <label>{field}</label>
                             <input type="text" name={field} onChange={handleInputChange} />
