@@ -121,7 +121,7 @@ function Crud(props) {
                 </div>
                 <div className="flex-large">
                     <h2>View posts</h2>
-                    <PostTable posts={posts} editRow={editRow} deletePost={deletePost}/>
+                    <PostTable posts={posts} postFields={postFields} editRow={editRow} deletePost={deletePost}/>
                 </div>
             </div>
         </div>

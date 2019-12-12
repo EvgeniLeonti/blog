@@ -1,38 +1,30 @@
 import React from 'react'
+import PostTableRow from './PostTableRow'
 
 const PostTable = props => (
     <table>
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Content</th>
-            <th>Actions</th>
+            {props.postFields.length > 0 ? (
+                props.postFields.map(field => (
+                    <th>{field.name}</th>
+                ))
+            ) : (
+                <th>no fields</th>
+            )}
         </tr>
         </thead>
         <tbody>
         {props.posts.length > 0 ? (
             props.posts.map(post => (
                 <tr key={post.id}>
-                    <td>{post.id}</td>
-                    <td>{post.title}</td>
-                    <td>{post.content}</td>
-                    <td>
-                        <button
-                            onClick={() => {
-                                props.editRow(post)
-                            }}
-                            className="button muted-button"
-                        >
-                            Edit
-                        </button>
-
-                        <button onClick={() => props.deletePost({ variables: {
-                                id: post.id
-                            } })} className="button muted-button">
-                            Delete
-                        </button>
-                    </td>
+                    {props.postFields.length > 0 ? (
+                        props.postFields.map(field => (
+                            <td>{post[field.name]}</td>
+                        ))
+                    ) : (
+                        <td>no fields</td>
+                    )}
                 </tr>
             ))
         ) : (
