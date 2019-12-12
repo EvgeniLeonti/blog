@@ -6,12 +6,27 @@ import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 function Crud(props) {
-    let fields = props.postFieldsStr;
+    let postFields = props.postFields;
+    let types = props.types;
+
+    let fieldStr = ``;
+
+    for (const field of postFields) {
+        fieldStr += field.name;
+
+        let typeFields = types.find(type => type.name === field.type.name).fields;
+        if(typeFields) {
+            fieldStr += ` { ${typeFields.map(typeField => typeField.name).join(" ")} }`
+        }
+        fieldStr += ` `;
+    }
+
+    console.log(fieldStr);
 
     const GET_ALL_POSTS = gql`
         query {
             allPosts (sort: {createdAt: ASC, title: DESC}) {
-                ${fields}
+                ${fieldStr}
             }
         }
     `;

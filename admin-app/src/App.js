@@ -41,24 +41,12 @@ function App() {
     console.log("postFields:");
     console.log(postFields);
 
-    let postFieldsStr = ``;
 
-    for (const field of postFields) {
-        postFieldsStr += field.name;
-
-        let typeFields = types.find(type => type.name === field.type.name).fields;
-        if(typeFields) {
-            postFieldsStr += ` { ${typeFields.map(typeField => typeField.name).join(" ")} }`
-        }
-        postFieldsStr += ` `;
-    }
-
-    console.log(postFieldsStr);
 
 
     return (
         <React.Fragment>
-            <Crud postFieldsStr={postFieldsStr}>
+            <Crud types={types} postFields={postFields}>
             </Crud>
         </React.Fragment>
     );
