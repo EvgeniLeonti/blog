@@ -6,7 +6,8 @@ const schema = require('./schema').Schema;
 
 // The root provides a resolver function for each API endpoint
 const root = {
-    hello: () => {
+    hello: (...args) => {
+        console.log(args);
         return 'Hello world!';
     },
 };

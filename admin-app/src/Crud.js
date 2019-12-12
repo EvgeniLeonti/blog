@@ -10,7 +10,7 @@ function Crud(props) {
 
     const GET_ALL_POSTS = gql`
         query {
-            allPosts {
+            allPosts (sort: {createdAt: ASC, title: DESC}) {
                 ${fields}
             }
         }

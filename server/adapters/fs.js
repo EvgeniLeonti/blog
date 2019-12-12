@@ -34,7 +34,7 @@ adapter.create = (table, postObject) => {
   return postObject;
 };
 
-adapter.read = (table, id) => {
+adapter.read = (table, id, sort) => {
   if (id) {
     try {
       return JSON.parse(fs.readFileSync(`${rootPath}/${table}/${id}.json`).toString());
@@ -47,11 +47,60 @@ adapter.read = (table, id) => {
     }
   }
 
-  let posts = [];
+  let entities = [];
   for (const file of fs.readdirSync(`${rootPath}/${table}`)) {
-    posts.push(JSON.parse(fs.readFileSync(`${rootPath}/${table}/${file}`).toString()));
+    entities.push(JSON.parse(fs.readFileSync(`${rootPath}/${table}/${file}`).toString()));
   }
-  return posts;
+
+  let compareFunctions = [];
+  if (sort) {
+    let sortingFields = Object.keys(sort).reverse(); // reverse as the arguments gets here in opposite order of appearing
+
+    for (const sortField of sortingFields) {
+      let isDESC = sort[sortField] === 1;
+      let compareFunction;
+      if (isDESC) {
+        compareFunction = (e1, e2) => {
+          if (e1[sortField] < e2[sortField]) {
+            return 1;
+          }
+          if (e1[sortField] > e2[sortField]) {
+            return -1;
+          }
+          return 0;
+        };
+      }
+      else {
+        compareFunction = (e1, e2) => {
+          if (e1[sortField] > e2[sortField]) {
+            return -1;
+          }
+          if (e1[sortField] < e2[sortField]) {
+            return 1;
+          }
+          return 0;
+        };
+      }
+      compareFunction.sortBy = sortField;
+      compareFunctions.push(compareFunction);
+    }
+    console.log(compareFunctions)
+  }
+
+
+  let compareFunction = (e1, e2) => {
+    for (const fun of compareFunctions) {
+      let compareResult = fun(e1, e2);
+      if (compareResult !== 0) {
+        return compareResult;
+      }
+    }
+    return 0;
+  };
+
+  let backup = entities;
+  entities = entities.sort(compareFunction);
+  return entities;
 };
 
 adapter.update = (table, postObject) => {

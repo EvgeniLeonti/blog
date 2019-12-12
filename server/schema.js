@@ -42,7 +42,7 @@ for (const entity of entities) {
     // read all
     queryFields[`all${entity.pluralName}`] = {
         type: new GraphQLList(type), description: `Read all ${entity.pluralName}`, args: entity.readAllArgs(),
-        resolve: (source, {id}) => adapter.read(entity.dbTable)
+        resolve: (source, {...args}) => adapter.read(entity.dbTable, undefined, args.sort)
     };
 }
 
