@@ -1,5 +1,5 @@
 const {adapter} = require("./adapters/fs");
-const {GraphQLList, GraphQLObjectType, GraphQLSchema} = require('graphql');
+const {GraphQLList, GraphQLObjectType, GraphQLSchema, printSchema} = require('graphql');
 const fs = require('fs');
 
 adapter.init();
@@ -59,4 +59,20 @@ const Schema = new GraphQLSchema({
     })
 });
 
+entities = entities.map(entity => {
+    entity.manualProps = entity.manualProps.map(prop => {
+        return {
+            name: prop.name,
+            type: prop.type.name,
+            nonNullForMutation: prop.nonNullForMutation,
+        }
+    });
+    return {
+        name: entity.name,
+        manualProps: entity.manualProps,
+        autoProps: entity.autoProps,
+    }
+});
+
 exports.Schema = Schema;
+exports.Entities = entities;

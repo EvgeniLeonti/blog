@@ -3,6 +3,7 @@ const graphqlHTTP = require('express-graphql');
 
 // Construct a schema, using GraphQL schema language
 const schema = require('./schema').Schema;
+const entities = require('./schema').Entities;
 
 // The root provides a resolver function for each API endpoint
 const root = {
@@ -20,6 +21,10 @@ app.use('/graphql', cors(), graphqlHTTP({
     rootValue: root,
     graphiql: true,
 }));
+
+app.get('/entities', (req, res) => {
+    res.json(entities)
+});
 
 
 app.listen(4000);

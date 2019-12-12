@@ -76,6 +76,13 @@ class Entity {
         return this.graphQLTypeSortParameter;
     }
 
+    // Convert Entity object to customType for client
+    static convertFields() {
+        return {
+            manual: this.manualProps,
+            auto: this.autoProps,
+        }
+    }
 
 
 
