@@ -10,8 +10,9 @@ const PostTable = props => (
                     <th>{field.name}</th>
                 ))
             ) : (
-                <th>no fields</th>
+                <th></th>
             )}
+                <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -23,13 +24,30 @@ const PostTable = props => (
                             <td>{post[field.name]}</td>
                         ))
                     ) : (
-                        <td>no fields</td>
+                        <td></td>
                     )}
+                        <td>
+                                <button
+                                    onClick={() => {
+                                            props.editRow(post)
+                                    }}
+                                    className="button muted-button"
+                                >
+                                        Edit
+                                </button>
+
+                                <button onClick={() => props.deletePost({ variables: {
+                                                id: post.id
+                                        } })} className="button muted-button">
+                                        Delete
+                                </button>
+                        </td>
                 </tr>
             ))
+
         ) : (
             <tr>
-                <td colSpan={4}>No posts</td>
+                <td colSpan={props.postFields.length + 1}>No posts</td>
             </tr>
         )}
         </tbody>
