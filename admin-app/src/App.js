@@ -17,6 +17,9 @@ const GET_TYPES = gql`
                 name
                 fields {
                     name
+                    args {
+                        name
+                    }
                     type {
                         name
                     }
@@ -38,15 +41,21 @@ function App() {
     console.log(types);
 
     let postFields = types.find(type => type.name === "Post").fields;
-    console.log("postFields:");
-    console.log(postFields);
+    // console.log("postFields:");
+    // console.log(postFields);
 
+    let createPostFields = types
+        .find(type => type.name === "BlogMutations").fields
+        .find(field => field.name === "createPost").args
+        .map(arg => arg.name);
 
+    console.log("createPostFields:");
+    console.log(createPostFields);
 
 
     return (
         <React.Fragment>
-            <Crud types={types} postFields={postFields}>
+            <Crud types={types} postFields={postFields} createPostFields={createPostFields}>
             </Crud>
         </React.Fragment>
     );

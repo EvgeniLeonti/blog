@@ -115,7 +115,7 @@ function Crud(props) {
                     ) : (
                         <div>
                             <h2>Add post</h2>
-                            <AddPostForm addPost={addPost} />
+                            <AddPostForm addPost={addPost} createPostFields={props.createPostFields}/>
                         </div>
                     )}
                 </div>

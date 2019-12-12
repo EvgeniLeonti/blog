@@ -1,22 +1,33 @@
 import React, { useState } from 'react'
 
 const AddPostForm = props => {
-    let title, content;
+    const [currentPost, setCurrentPost] = useState(props.currentPost);
+
+    const handleInputChange = event => {
+        const { name, value } = event.target;
+        setCurrentPost({ ...currentPost, [name]: value })
+    };
 
     return (
         <form onSubmit={e => {
             e.preventDefault();
-            props.addPost({ variables: {
-                    authorId: "test",
-                    title: title.value,
-                    content: content.value,
-                } });
+            // todo debug
+            currentPost.authorId = "test";
+            props.addPost({ variables: currentPost });
 
         }}>
-            <label>Title</label>
-            <input type="text" name="title" ref={node => {title = node;}} />
-            <label>Content</label>
-            <input type="text" name="content" ref={node => {content = node;}} />
+                {props.createPostFields.length > 0 ? (
+                    props.createPostFields.map(field => (
+                        <React.Fragment>
+                            <label>{field}</label>
+                            <input type="text" name={field} onChange={handleInputChange} />
+                        </React.Fragment>
+
+                    ))
+                ) : (
+                    <td>no fields</td>
+                )}
+
             <button>Add new post</button>
         </form>
     )
