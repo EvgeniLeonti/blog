@@ -99,7 +99,7 @@ class Entity {
             let propName = prop.name;
 
             // convert custom entities (like Author etc') to string - to mutate by id
-            if (prop.convertToStringForMutation) {
+            if (propType !== GraphQLString) {
                 propType = GraphQLString;
                 propName = `${prop.name}Id`;
             }

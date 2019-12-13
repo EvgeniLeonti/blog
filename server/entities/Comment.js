@@ -4,7 +4,7 @@ const { GraphQLString } = require('graphql');
 
 const manualProps = [
     {name: "title", type: GraphQLString, nonNullForMutation: true},
-    {name: "author", type: Author.convertToGraphQLType(), nonNullForMutation: true, convertToStringForMutation: true},
+    {name: "author", type: Author.convertToGraphQLType(), nonNullForMutation: true},
     {name: "content", type: GraphQLString, nonNullForMutation: true}
 ];
 

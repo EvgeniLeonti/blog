@@ -12,7 +12,10 @@ function App(props) {
         let entityProps = entity.autoProps.concat(entity.manualProps);
         let fields = entityProps.map(prop => {
             if (prop.type !== "String") {
-                return `${prop.name} { id }`
+                if (!prop.fields) {
+                    return `${prop.name} { id }`;
+                }
+                return `${prop.name} { ${prop.fields.join(" ")} }`
             }
             return prop.name;
         }).join(" ");
