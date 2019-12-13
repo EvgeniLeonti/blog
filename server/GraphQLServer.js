@@ -16,7 +16,8 @@ const root = {
 const cors = require('cors');
 
 const app = express();
-app.use('/graphql', cors(), graphqlHTTP({
+app.use(cors());
+app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: root,
     graphiql: true,

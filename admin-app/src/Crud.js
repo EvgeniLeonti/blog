@@ -1,47 +1,40 @@
 import React, {useState} from "react";
-import EditPostForm from "./forms/EditPostForm";
-import AddPostForm from "./forms/AddPostForm";
-import PostTable from "./tables/PostTable";
+import EditForm from "./forms/EditForm";
+import AddForm from "./forms/AddForm";
+import EntityTable from "./tables/EntityTable";
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 function Crud(props) {
-    let schema = props.schema;
-    console.log(schema);
+    let entity = props.entity;
 
-    let postFields = props.postFields;
-    let createPostArgs = props.createPostArgs;
-    let types = props.types;
 
-    const GET_ALL_POSTS = gql`
+    const READ_ALL_QUERY = gql`
         query {
-            allPosts (sort: {createdAt: ASC, title: DESC}) {
-                ${console.log(schema.Post)}
+            all${entity.pluralName} (sort: {createdAt: DESC}) {
+                ${entity.fields}
             }
         }
     `;
 
-    console.log("createPostArgs");
-    // console.log(getStr(createPostArgs));
-
-    const CREATE_POST = gql`
-        mutation CreatePost($authorId: String!, $title: String!, $content: String!) {
-            createPost(authorId: $authorId, title: $title, content: $content) {
-                id title summary content createdAt
+    const CREATE_MUTATION = gql`
+        mutation Create${entity.name}(${entity.mutationParams}) {
+            create${entity.name}(${entity.mutationVars}) {
+                ${entity.fields}
             }
         }
     `;
 
-    const EDIT_POST = gql`
-        mutation EditPost($id: String!, $authorId: String!, $title: String!, $content: String!){
-            updatePost(id: $id, authorId: $authorId, title: $title, content: $content) {
+    const EDIT_MUTATION = gql`
+        mutation Edit${entity.name}($id: String!, ${entity.mutationParams}){
+            update${entity.name}(id: $id, ${entity.mutationVars}) {
                 id
             }
         }`;
 
-    const DELETE_POST = gql`
-        mutation DeletePost($id: String!){
-            deletePost(id: $id) {id}
+    const DELETE_MUTATION = gql`
+        mutation Delete${entity.name}($id: String!){
+            delete${entity.name}(id: $id) {id}
         }
     `;
 
@@ -50,72 +43,67 @@ function Crud(props) {
 
     // custom hooks
     const [editing, setEditing] = useState(false);
-    const initialFormState = { id: null, title: '', content: '' };
-    const [currentPost, setCurrentPost] = useState(initialFormState);
+    const initialFormState = { id: null, title: '', content: '' }; // TODO undefined?
+    const [currentEntity, setCurrentEntity] = useState(initialFormState);
 
     // apollo hooks
-    const {data: getAllPostsQuery, loading: getAllPostsLoading, error: getAllPostsError} = useQuery(GET_ALL_POSTS);
+    const {data, loading, error} = useQuery(READ_ALL_QUERY);
 
-    const [addPost] = useMutation(CREATE_POST, {
-        refetchQueries: [{ query: GET_ALL_POSTS }],
+    const [createEntity] = useMutation(CREATE_MUTATION, {
+        refetchQueries: [{ query: READ_ALL_QUERY }],
     });
 
-    const [editPost] = useMutation(EDIT_POST, {
-        refetchQueries: [{ query: GET_ALL_POSTS }],
+    const [editEntity] = useMutation(EDIT_MUTATION, {
+        refetchQueries: [{ query: READ_ALL_QUERY }],
         update() {
             setEditing(false);
         }
     });
 
-    const [deletePost] = useMutation(DELETE_POST, {
-        refetchQueries: [{ query: GET_ALL_POSTS }],
+    const [deleteEntity] = useMutation(DELETE_MUTATION, {
+        refetchQueries: [{ query: READ_ALL_QUERY }],
     });
 
+    let createEntityArgs = entity.manualProps.map(prop => {
+        let newProp = JSON.parse(JSON.stringify(prop));
+        if (newProp.type !== "String") {
+            newProp.name = `${newProp.name}Id`;
+        }
+        return newProp;
+    });
 
+    // get all entities
+    if (loading) return (<p>Loading entities...</p>);
+    if (error) return (<p>Error getting entities: {JSON.stringify(error)}</p>);
 
-
-
-    // get all posts
-    if (getAllPostsLoading) return (<p>Loading posts...</p>);
-    if (getAllPostsError) return (<p>Error getting posts: {JSON.stringify(getAllPostsError)}</p>);
-    const posts = getAllPostsQuery.allPosts;
-    // console.log("posts:");
-    // console.log(posts);
-
-    const editRow = post => {
-        console.log("editRow, post is:");
-        console.log(post);
+    const editRow = entity => {
         setEditing(true);
-        setCurrentPost({ id: post.id, title: post.title, content: post.content })
+        setCurrentEntity(entity)
     };
 
-
     return (
-        <div className="container">
-            <h1>CRUD App with Hooks</h1>
-            <div className="flex-row">
-                <div className="flex-large">
-                    {editing ? (
-                        <div>
-                            <h2>Edit post</h2>
-                            <EditPostForm
-                                editing={editing}
-                                setEditing={setEditing}
-                                currentPost={currentPost}
-                                editPost={editPost}
-                            />
-                        </div>
-                    ) : (
-                        <div>
-                            <h2>Add post</h2>
-                            <AddPostForm addPost={addPost} createPostArgs={createPostArgs}/>
-                        </div>
-                    )}
-                </div>
-                <div className="flex-large">
-                    <h2>View posts</h2>
-                    <PostTable posts={posts} postFields={postFields} editRow={editRow} deletePost={deletePost}/>
-                </div>
+        <div className="flex-row">
+            <div className="flex-large">
+                {editing ? (
+                    <div>
+                        <h2>Edit {entity.name}</h2>
+                        <EditForm
+                            editing={editing}
+                            setEditing={setEditing}
+                            currentEntity={currentEntity}
+                            editEntity={editEntity}
+                        />
+                    </div>
+                ) : (
+                    <div>
+                        <h2>Add {entity.name}</h2>
+                        <AddForm addEntity={createEntity} createEntityArgs={createEntityArgs}/>
+                    </div>
+                )}
+            </div>
+            <div className="flex-large">
+                <h2>View {entity.pluralName}</h2>
+                <EntityTable entities={data[`all${entity.pluralName}`]} entityFields={entity.manualProps.concat(entity.autoProps)} editRow={editRow} deleteEntity={deleteEntity}/>
             </div>
         </div>
     );

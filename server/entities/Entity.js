@@ -17,6 +17,10 @@ class Entity {
 
         // manual props
         for (const prop of manualProps) {
+            // prop with compound type
+            if (prop.type.name !== "String") {
+                this[`${prop.name}Id`] = args[`${prop.name}Id`];
+            }
             this[prop.name] = args[prop.name];
         }
 

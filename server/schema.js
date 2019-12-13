@@ -7,11 +7,33 @@ adapter.init();
 let queryFields = {};
 let mutationFields = {};
 
-let entities = fs.readdirSync(`./entities`)
+const entities = fs.readdirSync(`./entities`)
     .map(fileName => fileName.split(".")[0]) // remove the .js extension from filename
     .filter(className => className !== "Entity") // ignore the abstract class Entity
     .map(className => require(`./entities/${className}.js`)[className]);
 // let entities = [require("./entities/Post").Post];
+
+let setCompoundFields = (entityObject, entityFieldsFromDB) => {
+    let compoundFields = entityObject.manualProps.filter(props => props.type !== "String");
+    for (const compoundField of compoundFields) {
+        let id = entityFieldsFromDB[`${compoundField.name}Id`];
+        let ent = entities.find(ent => ent.name === compoundField.type);
+
+        delete entityFieldsFromDB[`${compoundField.name}Id`];
+        entityFieldsFromDB[compoundField.name] = adapter.read(ent.dbTable, id);
+    }
+};
+
+let validateCompoundFields = (entityObject, entityFieldsFromUser) => {
+    let compoundFields = entityObject.manualProps.filter(props => props.type !== "String");
+    for (const compoundField of compoundFields) {
+        let id = entityFieldsFromUser[`${compoundField.name}Id`];
+        let ent = entities.find(ent => ent.name === compoundField.type);
+
+        adapter.read(ent.dbTable, id); // will throw an exception if not exists // todo catch it
+    }
+};
+
 for (const entity of entities) {
     let type = entity.convertToGraphQLType();
 
@@ -24,7 +46,10 @@ for (const entity of entities) {
     // create
     mutationFields[`create${entity.name}`] = {
         type: type, description: `Create new ${entity.name}`, args: entity.createArgs(),
-        resolve: (source, {...args}) => adapter.create(entity.dbTable, new entity(args))
+        resolve: (source, {...args}) => {
+            validateCompoundFields(entity, args);
+            return adapter.create(entity.dbTable, new entity(args));
+        }
     };
 
     // update
@@ -42,7 +67,13 @@ for (const entity of entities) {
     // read all
     queryFields[`all${entity.pluralName}`] = {
         type: new GraphQLList(type), description: `Read all ${entity.pluralName}`, args: entity.readAllArgs(),
-        resolve: (source, {...args}) => adapter.read(entity.dbTable, undefined, args.sort)
+        resolve: (source, {...args}) => {
+            let entitiesArray = adapter.read(entity.dbTable, undefined, args.sort);
+            for (const entityFieldsFromDB of entitiesArray) {
+                setCompoundFields(entity, entityFieldsFromDB);
+            }
+            return entitiesArray;
+        }
     };
 }
 
@@ -59,7 +90,7 @@ const Schema = new GraphQLSchema({
     })
 });
 
-entities = entities.map(entity => {
+let clientEntities = entities.map(entity => {
     entity.manualProps = entity.manualProps.map(prop => {
         return {
             name: prop.name,
@@ -69,10 +100,11 @@ entities = entities.map(entity => {
     });
     return {
         name: entity.name,
+        pluralName: entity.pluralName,
         manualProps: entity.manualProps,
         autoProps: entity.autoProps,
     }
 });
 
 exports.Schema = Schema;
-exports.Entities = entities;
+exports.Entities = clientEntities;

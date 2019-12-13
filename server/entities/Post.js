@@ -15,7 +15,7 @@ class Post extends Entity{
     constructor(args) {
         super(args, manualProps);
 
-        if (!this.summary) {
+        if (!args.summary) {
             this.summary = this.content.substring(0, 100);
         }
     }
