@@ -3,7 +3,11 @@ import React from 'react'
 function EntityTableRow (props) {
     let entity = props.entity;
     return (
-        <tr key={entity.id}>
+
+
+
+
+        <tr key={entity.id} role="row" className="odd">
             {props.entityFields.length > 0 ? (
                 props.entityFields.map(field => (
                     <td>{typeof entity[field.name] === "string" ? entity[field.name] : JSON.stringify(entity[field.name])}</td>

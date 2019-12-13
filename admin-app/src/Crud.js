@@ -4,10 +4,11 @@ import AddForm from "./forms/AddForm";
 import EntityTable from "./tables/EntityTable";
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
+import { useParams } from 'react-router-dom';
 
 function Crud(props) {
-    let entity = props.entity;
-
+    let { entityName } = useParams();
+    let entity = props.entities.find(entity => entity.name === entityName);
 
     const READ_ALL_QUERY = gql`
         query {
@@ -51,6 +52,9 @@ function Crud(props) {
 
     const [createEntity] = useMutation(CREATE_MUTATION, {
         refetchQueries: [{ query: READ_ALL_QUERY }],
+        update() {
+            alert("success");
+        }
     });
 
     const [editEntity] = useMutation(EDIT_MUTATION, {
@@ -78,34 +82,29 @@ function Crud(props) {
 
     const editRow = entity => {
         setEditing(true);
+        console.log("entity")
+        console.log(entity)
         setCurrentEntity(entity)
     };
 
     return (
-        <div className="flex-row">
-            <div className="flex-large">
-                {editing ? (
-                    <div>
-                        <h2>Edit {entity.name}</h2>
-                        <EditForm
-                            editing={editing}
-                            setEditing={setEditing}
-                            currentEntity={currentEntity}
-                            editEntity={editEntity}
-                        />
-                    </div>
-                ) : (
-                    <div>
-                        <h2>Add {entity.name}</h2>
-                        <AddForm addEntity={createEntity} createEntityArgs={createEntityArgs}/>
-                    </div>
-                )}
-            </div>
-            <div className="flex-large">
-                <h2>View {entity.pluralName}</h2>
-                <EntityTable entities={data[`all${entity.pluralName}`]} entityFields={entity.manualProps.concat(entity.autoProps)} editRow={editRow} deleteEntity={deleteEntity}/>
-            </div>
-        </div>
+        <React.Fragment>
+            <h1 className="h3 mb-2 text-gray-800">{entity.pluralName}</h1>
+            {props.operation === "read" ? (
+                <React.Fragment>
+                    <p className="mb-4">
+                        On this page you can edit and delete {entity.pluralName}.
+                        You can also <a href={`${entity.name}/create`}>Create</a> a new one.
+                    </p>
+                    <EntityTable entities={data[`all${entity.pluralName}`]} entityFields={entity.manualProps.concat(entity.autoProps)} editRow={editRow} deleteEntity={deleteEntity}/>
+                </React.Fragment>
+            ) : (
+                <div>
+                    <p className="mb-4">Create new {entity.name}.</p>
+                    <AddForm addEntity={createEntity} createEntityArgs={createEntityArgs}/>
+                </div>
+            )}
+        </React.Fragment>
     );
 }
 

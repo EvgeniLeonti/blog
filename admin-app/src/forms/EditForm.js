@@ -18,20 +18,24 @@ const EditForm = props => {
     return (
         <form onSubmit={e => {
             e.preventDefault();
-            console.log(currentEntity)
 
             props.editEntity({ variables: currentEntity });
 
         }}>
 
-            <label>Title</label>
-            <input type="text" name="title" value={currentEntity.title} onChange={handleInputChange} />
-            <label>Content</label>
-            <input type="text" name="content" value={currentEntity.content} onChange={handleInputChange} />
+            {props.editEntityArgs.length > 0 ? (
+                props.editEntityArgs.map(arg => (
+                    <React.Fragment>
+                        <label>{arg.name}</label>
+                        <input type="text" name={arg.name} onChange={handleInputChange} />
+                    </React.Fragment>
 
-            <input type="hidden" name="id" value={currentEntity.id} onChange={handleInputChange} />
+                ))
+            ) : (
+                <td>no fields</td>
+            )}
 
-            <button>Update Entity</button>
+            <button>Update</button>
             <button onClick={() => props.setEditing(false)} className="button muted-button">
                 Cancel
             </button>

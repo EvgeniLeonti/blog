@@ -28,14 +28,22 @@ const client = new ApolloClient({
     let entitiesMetaData = await axios.get(ENTITIES_URL);
 
     console.log(entitiesMetaData.data);
-    ReactDOM.render(<ApolloProvider client={client}><App entities={entitiesMetaData.data}/></ApolloProvider>, document.getElementById('root'));
+    // ReactDOM.render(<ApolloProvider client={client}><App entities={entitiesMetaData.data}/></ApolloProvider>, document.getElementById('wrapper'));
+    ReactDOM.render(<ApolloProvider client={client}><App entities={entitiesMetaData.data}/></ApolloProvider>, document.getElementById('wrapper'));
 
     // If you want your app to work offline and load faster, you can change
     // unregister() to register() below. Note this comes with some pitfalls.
     // Learn more about service workers: https://bit.ly/CRA-PWA
     serviceWorker.unregister();
 })().catch(error => {
-    console.log(error);
+    console.log(JSON.stringify(error));
+    ReactDOM.render(<div className="text-center">
+        <div className="error mx-auto" data-text={error.name}>{error.name}</div>
+        <p className="lead text-gray-800 mb-5">{error.message}</p>
+        <p className="text-gray-500 mb-0">It looks like the server isn't running...</p>
+        {/*<a href="index.html">← Back to Dashboard</a>*/}
+    </div>, document.getElementById('wrapper'))
+
 });
 
 
