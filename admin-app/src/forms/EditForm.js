@@ -1,45 +1,84 @@
 import React, { useState, useEffect  } from 'react'
+import gql from "graphql-tag";
+import {useMutation, useQuery} from "@apollo/react-hooks";
+import {Link} from "react-router-dom";
+
 
 const EditForm = props => {
-    const [currentEntity, setCurrentEntity] = useState(props.currentEntity);
+    let entity = props.entity;
+    let entityData = props.data;
+
+    const [currentEntity, setCurrentEntity] = useState(entityData);
 
     const handleInputChange = event => {
         const { name, value } = event.target;
-        setCurrentEntity({ ...currentEntity, [name]: value })
+        setCurrentEntity({ ...currentEntity, [name]: value });
     };
 
-    // In the Effect Hook, we create a callback function that updates the user state with the new prop thats being sent through. Before, we needed to compare if (prevProps.currentUser !== this.state.currentUser), but with the Effect Hook we can just pass [props] through to let it know we're watching props.
-    // The Effect Hook lets you perform side effects in function components:
-    //By using this Hook, you tell React that your component needs to do something after render. React will remember the function you passed (we’ll refer to it as our “effect”), and call it later after performing the DOM updates. In this effect, we set the document title, but we could also perform data fetching or call some other imperative API.
-    useEffect(() => {
-        setCurrentEntity(props.currentEntity)
-    }, [props]);
 
-    return (
+
+    const CREATE_MUTATION = gql`
+        mutation Create${entity.name}(${entity.mutationParams}) {
+            create${entity.name}(${entity.mutationVars}) {
+                ${entity.fields}
+            }
+        }
+    `;
+    const [createEntity, mutationResult] = useMutation(CREATE_MUTATION);
+
+    if (mutationResult.loading) {
+        return <div>Loading...</div>
+    }
+
+
+    let form =  <React.Fragment>
+        <a href="./../">← Back to {entity.pluralName}</a>
+        <hr />
+        <h1 className="h3 mb-2 text-gray-800">Edit {entity.name}</h1>
         <form onSubmit={e => {
             e.preventDefault();
-
-            props.editEntity({ variables: currentEntity });
+            createEntity({ variables: currentEntity })
 
         }}>
-
-            {props.editEntityArgs.length > 0 ? (
-                props.editEntityArgs.map(arg => (
-                    <React.Fragment>
+            {entity.manualProps.length > 0 ? (
+                entity.manualProps.map(arg => (
+                    <div key={arg.name} className="form-group">
                         <label>{arg.name}</label>
-                        <input type="text" name={arg.name} onChange={handleInputChange} />
-                    </React.Fragment>
-
+                        <input
+                            name={arg.name}
+                            type="text"
+                            className="form-control form-control-user"
+                            value={currentEntity[arg.name]}
+                            onChange={handleInputChange}
+                            // placeholder={arg.name}
+                        />
+                    </div>
                 ))
             ) : (
                 <td>no fields</td>
             )}
 
-            <button>Update</button>
-            <button onClick={() => props.setEditing(false)} className="button muted-button">
-                Cancel
-            </button>
+
+            <button className="btn btn-primary btn-user btn-block">Update</button>
         </form>
+    </React.Fragment>;
+
+    if (mutationResult.called) {
+        if (!mutationResult.error) {
+            return (
+                <React.Fragment>
+                    <div>Successfully updated. </div>
+                    <br />
+                    {form}
+                </React.Fragment>
+            )
+        }
+    }
+
+    return (
+        <React.Fragment>
+            {form}
+        </React.Fragment>
     )
 };
 

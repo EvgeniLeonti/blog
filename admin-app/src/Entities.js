@@ -3,6 +3,7 @@ import { Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
 import Crud from "./Crud";
 import ContentWrapper from "./components/ContentWrapper";
 import {useMutation} from "@apollo/react-hooks";
+import Edit from "./Edit";
 
 
 function Entities(props) {
@@ -12,8 +13,11 @@ function Entities(props) {
 
     return (
         <Switch>
-            <Route path={`${match.path}/:entityName/:create`}>
+            <Route path={`${match.path}/:entityName/create`}>
                 <Crud operation="create" entities={entities}/>
+            </Route>
+            <Route path={`${match.path}/:entityName/update/:id`}>
+                <Edit entities={entities}/>
             </Route>
             <Route path={`${match.path}/:entityName`}>
                 <Crud operation="read" entities={entities}/>

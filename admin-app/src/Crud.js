@@ -82,8 +82,6 @@ function Crud(props) {
 
     const editRow = entity => {
         setEditing(true);
-        console.log("entity")
-        console.log(entity)
         setCurrentEntity(entity)
     };
 
@@ -96,7 +94,10 @@ function Crud(props) {
                         On this page you can edit and delete {entity.pluralName}.
                         You can also <a href={`${entity.name}/create`}>Create</a> a new one.
                     </p>
-                    <EntityTable entities={data[`all${entity.pluralName}`]} entityFields={entity.manualProps.concat(entity.autoProps)} editRow={editRow} deleteEntity={deleteEntity}/>
+                    <EntityTable
+                        data={data[`all${entity.pluralName}`]}
+                        entity={entity}
+                    />
                 </React.Fragment>
             ) : (
                 <div>
