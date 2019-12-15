@@ -1,14 +1,13 @@
-import React, { useState, useEffect  } from 'react'
+import React from 'react';
 import gql from "graphql-tag";
-import {useMutation, useQuery} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/react-hooks";
 import { useParams } from 'react-router-dom';
-import EditForm from "./forms/EditForm";
+import EditForm from "../forms/EditForm";
 
 
 const Edit = props => {
     let { entityName, id } = useParams();
     let entity = props.entities.find(entity => entity.name === entityName);
-
 
     const READ_QUERY = gql`
         query {

@@ -16,7 +16,7 @@ const AddForm = props => {
         }
     `;
 
- const [createEntity, mutationResult] = useMutation(CREATE_MUTATION);
+ const [updateEntity, mutationResult] = useMutation(CREATE_MUTATION);
  const handleInputChange = event => {
   const {name, value} = event.target;
   setCurrentEntity({...currentEntity, [name]: value})
@@ -34,7 +34,7 @@ const AddForm = props => {
   <form onSubmit={e => {
    e.preventDefault();
 
-   createEntity({ variables: currentEntity })
+   updateEntity({ variables: currentEntity })
   }}>
    {entity.manualProps.length > 0 ? (
     entity.manualProps.map(arg => (

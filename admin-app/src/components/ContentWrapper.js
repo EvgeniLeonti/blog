@@ -1,10 +1,6 @@
 import React from 'react'
-import Crud from "../Crud";
 
 const ContentWrapper = props => {
-    let entities = props.entities;
-
-
     return (
         <div id="content-wrapper" className="d-flex flex-column">
 

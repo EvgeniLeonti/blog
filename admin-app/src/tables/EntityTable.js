@@ -4,7 +4,7 @@ const EntityTable = props => {
  console.log("props of entity table:");
  console.log(props);
  let entity = props.entity;
- let entityFields = entity.manualProps.concat(entity.autoProps);
+ let entityFields = entity.manualProps;
  return (
   <div className="card shadow mb-4">
    <div className="card-header py-3">
@@ -22,7 +22,7 @@ const EntityTable = props => {
          <tr role="row">
           {entityFields.length > 0 ? (
            entityFields.map(field => (
-            <th>{field.name}</th>
+            <th key={field.name}>{field.name}</th>
            ))
           ) : (
            <th></th>
@@ -37,7 +37,7 @@ const EntityTable = props => {
            <tr key={entityData.id} role="row" className="odd">
             {entityFields.length > 0 ? (
              entityFields.map(field => (
-              <td>{typeof entityData[field.name] === "string" ? entityData[field.name] : JSON.stringify(entityData[field.name])}</td>
+              <td key={entityData.id + "_" + field.name}>{typeof entityData[field.name] === "string" ? entityData[field.name] : JSON.stringify(entityData[field.name])}</td>
              ))
             ) : (
              <td></td>
@@ -59,15 +59,6 @@ const EntityTable = props => {
                                                         <span className="icon text-white-50"><i
                                                          className="fas fa-trash"></i></span>
              </a>
-
-
-             {/*<button onClick={() => props.deleteEntity({*/}
-             {/*    variables: {*/}
-             {/*        id: entityData.id*/}
-             {/*    }*/}
-             {/*})} className="button muted-button">*/}
-             {/*    Delete*/}
-             {/*</button>*/}
             </td>
            </tr>
           ))
