@@ -17,14 +17,13 @@ const EditForm = props => {
 
 
 
-    const CREATE_MUTATION = gql`
-        mutation Create${entity.name}(${entity.mutationParams}) {
-            create${entity.name}(${entity.mutationVars}) {
-                ${entity.fields}
+    const EDIT_MUTATION = gql`
+        mutation Edit${entity.name}($id: String!, ${entity.mutationParams}){
+            update${entity.name}(id: $id, ${entity.mutationVars}) {
+                id
             }
-        }
-    `;
-    const [createEntity, mutationResult] = useMutation(CREATE_MUTATION);
+        }`;
+    const [createEntity, mutationResult] = useMutation(EDIT_MUTATION);
 
     if (mutationResult.loading) {
         return <div>Loading...</div>

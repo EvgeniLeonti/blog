@@ -87,23 +87,22 @@ function Crud(props) {
 
     return (
         <React.Fragment>
-            <h1 className="h3 mb-2 text-gray-800">{entity.pluralName}</h1>
+
             {props.operation === "read" ? (
                 <React.Fragment>
+                    <h1 className="h3 mb-2 text-gray-800">{entity.pluralName}</h1>
                     <p className="mb-4">
                         On this page you can edit and delete {entity.pluralName}.
-                        You can also <a href={`${entity.name}/create`}>Create</a> a new one.
+                        You can also <a href={`/entity/${entity.name}/create`}>Create</a> a new one.
                     </p>
                     <EntityTable
                         data={data[`all${entity.pluralName}`]}
                         entity={entity}
+                        deleteEntity={deleteEntity}
                     />
                 </React.Fragment>
             ) : (
-                <div>
-                    <p className="mb-4">Create new {entity.name}.</p>
-                    <AddForm addEntity={createEntity} createEntityArgs={createEntityArgs}/>
-                </div>
+             <AddForm entity={entity} addEntity={createEntity} createEntityArgs={createEntityArgs}/>
             )}
         </React.Fragment>
     );
