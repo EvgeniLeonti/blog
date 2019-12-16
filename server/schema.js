@@ -65,14 +65,21 @@ for (const entity of entities) {
             // make sure createdAt stays as before
             args.createdAt = oldPostObject.createdAt;
 
-            return adapter.update(entity.dbTable, new entity(args))
+            let entityFieldsFromDB = adapter.update(entity.dbTable, new entity(args));
+            setCompoundFields(entity, entityFieldsFromDB);
+            return entityFieldsFromDB;
         }
     };
 
     // delete
     mutationFields[`delete${entity.name}`] = {
         type: type, description: `Delete ${entity.name} by id`, args: entity.deleteArgs(),
-        resolve: (source, {...args}) => adapter.delete(entity.dbTable, args.id)
+        resolve: (source, {...args}) => {
+
+            let entityFieldsFromDB = adapter.delete(entity.dbTable, args.id);
+            setCompoundFields(entity, entityFieldsFromDB);
+            return entityFieldsFromDB;
+        }
     };
 
     // read all

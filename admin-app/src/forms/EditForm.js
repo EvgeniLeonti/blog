@@ -2,9 +2,31 @@ import React, {useEffect, useState} from 'react'
 import gql from "graphql-tag";
 import {useMutation} from "@apollo/react-hooks";
 
+// import { Editor } from 'react-draft-wysiwyg';
+
+import {convertFromRaw, convertToRaw, EditorState, Editor} from 'draft-js';
+import {
+    inlineToolbarPlugin,
+    toolbarPlugin,
+} from "draft-js-buttons";
+
+import '../../node_modules/draft-js/dist/Draft.css';
+
+
+
 const EditForm = props => {
     let entity = props.entity;
     let entityData = props.data;
+
+
+    // console.log("parsed");
+    // console.log(convertFromRaw(JSON.parse(entityData.content)))
+
+    let content;
+    const [editorState, setEditorState] = React.useState(
+     EditorState.createWithContent(convertFromRaw(JSON.parse(entityData.content))),
+     // EditorState.createEmpty(),
+    );
 
     const [currentEntity, setCurrentEntity] = useState(entityData);
 
@@ -12,7 +34,6 @@ const EditForm = props => {
         const { name, value } = event.target;
         setCurrentEntity({ ...currentEntity, [name]: value });
     };
-
 
 
     const EDIT_MUTATION = gql`
@@ -42,6 +63,8 @@ const EditForm = props => {
         return <div>Loading...</div>
     }
 
+    console.log("currentEntity");
+    console.log(currentEntity);
 
 
     let form =  <React.Fragment>
@@ -50,7 +73,27 @@ const EditForm = props => {
         <h1 className="h3 mb-2 text-gray-800">Edit {entity.name}</h1>
         <form onSubmit={e => {
             e.preventDefault();
-            createEntity({ variables: currentEntity })
+
+            // before submiting serialize compund
+            let serialized = {
+
+            };
+
+            for (const prop of entity.manualProps.concat(entity.autoProps)) {
+                if (prop.type === "String") {
+                    serialized[prop.name] = currentEntity[prop.name];
+                }
+                else {
+                    serialized[`${prop.name}Id`] = currentEntity[prop.name].id;
+                }
+            }
+
+            serialized.content = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
+
+            console.log("serialized");
+            console.log(serialized);
+
+            createEntity({ variables: serialized })
 
         }}>
             <div className="row">
@@ -80,14 +123,27 @@ const EditForm = props => {
                 entity.manualProps.map(arg => (
                     <div key={arg.name} className="form-group">
                         <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
-                        <input
-                            name={arg.type !== "String" ? arg.name + "Id" : arg.name}
-                            type="text"
-                            className="form-control form-control-user"
-                            value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
-                            onChange={handleInputChange}
-                            // placeholder={arg.name}
-                        />
+
+                        {arg.name === "content" ? (
+                         <div>
+                          <Editor
+                           editorState={editorState}
+                           onChange={setEditorState}
+                           plugins={[inlineToolbarPlugin, toolbarPlugin]}
+                          />
+
+                         </div>
+                        ) : (
+                         <input
+                          name={arg.type !== "String" ? arg.name + "Id" : arg.name}
+                          type="text"
+                          className="form-control form-control-user"
+                          value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
+                          onChange={handleInputChange}
+                          // placeholder={arg.name}
+                         />
+                        )}
+
                     </div>
                 ))
             ) : (
