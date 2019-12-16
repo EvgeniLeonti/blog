@@ -8,6 +8,8 @@ const EditForm = props => {
     let entity = props.entity;
     let entityData = props.data;
 
+    let richEditArgNames = ["content"]; // todo server side
+
     const [currentEntity, setCurrentEntity] = useState(entityData);
 
     const EDIT_MUTATION = gql`
@@ -77,9 +79,9 @@ const EditForm = props => {
                     <div key={arg.name} className="form-group">
                         <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
 
-                        {arg.name === "content" ? (
+                        {richEditArgNames.find(argName => argName === arg.name) ? (
                          <div>
-                          <RichEditor name={arg.name} onChange={handleInputChange} value={entityData.content} />
+                          <RichEditor name={arg.name} onChange={handleInputChange} value={entityData[arg.name]} />
                          </div>
                         ) : (
                          <input
