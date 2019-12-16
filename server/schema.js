@@ -55,7 +55,14 @@ for (const entity of entities) {
     // update
     mutationFields[`update${entity.name}`] = {
         type: type, description: `Update ${entity.name} by id`, args: entity.updateArgs(),
-        resolve: (source, {...args}) => adapter.update(entity.dbTable, new entity(args))
+        resolve: (source, {...args}) => {
+            // read the old object to verify it exists
+            let oldPostObject = adapter.read(entity.dbTable, args.id);
+            // make sure createdAt stays as before
+            args.createdAt = oldPostObject.createdAt;
+
+            return adapter.update(entity.dbTable, new entity(args))
+        }
     };
 
     // delete

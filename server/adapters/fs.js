@@ -104,9 +104,6 @@ adapter.read = (table, id, sort) => {
 };
 
 adapter.update = (table, postObject) => {
-  // read the old object to verify it exists
-  let oldPostObject = adapter.read(table, postObject.id);
-
   let filePath = `${rootPath}/${table}/${postObject.id}.json`;
   let write = fs.openSync(filePath, 'w');
   fs.writeFileSync(filePath, JSON.stringify(postObject));
