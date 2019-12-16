@@ -77,15 +77,14 @@ const EditForm = props => {
             )}
             </div>
             {entity.manualProps.length > 0 ? (
-
                 entity.manualProps.map(arg => (
                     <div key={arg.name} className="form-group">
-                        <label>{arg.name}</label>
+                        <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
                         <input
-                            name={arg.name}
+                            name={arg.type !== "String" ? arg.name + "Id" : arg.name}
                             type="text"
                             className="form-control form-control-user"
-                            value={currentEntity[arg.name]}
+                            value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
                             onChange={handleInputChange}
                             // placeholder={arg.name}
                         />

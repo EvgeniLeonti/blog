@@ -40,7 +40,11 @@ for (const entity of entities) {
     // read
     queryFields[entity.name] = {
         type: type, description: `Read ${entity.name} by id`, args: entity.readArgs(),
-        resolve: (source, {id}) => adapter.read(entity.dbTable, id)
+        resolve: (source, {id}) => {
+            let entityFieldsFromDB = adapter.read(entity.dbTable, id);
+            setCompoundFields(entity, entityFieldsFromDB);
+            return entityFieldsFromDB;
+        }
     };
 
     // create

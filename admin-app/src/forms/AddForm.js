@@ -16,7 +16,9 @@ const AddForm = props => {
         }
     `;
 
- const [updateEntity, mutationResult] = useMutation(CREATE_MUTATION);
+ const [updateEntity, mutationResult] = useMutation(CREATE_MUTATION, {
+  onError: (error) => {return <div>Error: {JSON.stringify(error)}</div>}
+ });
  const handleInputChange = event => {
   const {name, value} = event.target;
   setCurrentEntity({...currentEntity, [name]: value})
@@ -24,6 +26,9 @@ const AddForm = props => {
 
  if (mutationResult.loading) {
   return <div>Loading...</div>
+ }
+ if (mutationResult.error) {
+  return <div>Error: {JSON.stringify(mutationResult.error)}</div>
  }
 
 
@@ -39,9 +44,9 @@ const AddForm = props => {
    {entity.manualProps.length > 0 ? (
     entity.manualProps.map(arg => (
      <div key={arg.name} className="form-group">
-      <label>{arg.name}</label>
+      <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
       <input
-       name={arg.name}
+       name={arg.type !== "String" ? arg.name + "Id" : arg.name}
        type="text"
        className="form-control form-control-user"
        value={currentEntity[arg.name]}
