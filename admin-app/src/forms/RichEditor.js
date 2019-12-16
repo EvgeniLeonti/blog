@@ -7,8 +7,8 @@ class RichEditor extends React.Component {
  constructor(props) {
   super(props);
 
-  if (props.content) {
-   this.state = {editorState: EditorState.createWithContent(convertFromRaw(JSON.parse(props.content)))};
+  if (props.value) {
+   this.state = {editorState: EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)))};
   }
   else {
    this.state = {editorState: EditorState.createEmpty()};
@@ -16,7 +16,9 @@ class RichEditor extends React.Component {
 
   this.focus = () => this.refs.editor.focus();
   this.onChange = (editorState) => {
-   props.onChange(JSON.stringify(convertToRaw(editorState.getCurrentContent())));
+   props.onChange({target: {
+     name: props.name, value: JSON.stringify(convertToRaw(editorState.getCurrentContent()))
+    }});
    this.setState({editorState})
   };
 

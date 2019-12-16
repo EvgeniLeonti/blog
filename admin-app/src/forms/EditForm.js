@@ -8,20 +8,7 @@ const EditForm = props => {
     let entity = props.entity;
     let entityData = props.data;
 
-
-    let content = entityData.content;
-
     const [currentEntity, setCurrentEntity] = useState(entityData);
-
-    const handleInputChange = event => {
-        const { name, value } = event.target;
-        setCurrentEntity({ ...currentEntity, [name]: value });
-    };
-
-    const handleContentChange = strContent => {
-        content = strContent;
-    };
-
 
     const EDIT_MUTATION = gql`
         mutation Edit${entity.name}($id: String!, ${entity.mutationParams}){
@@ -31,28 +18,14 @@ const EditForm = props => {
         }`;
     const [createEntity, mutationResult] = useMutation(EDIT_MUTATION);
 
-
-    useEffect(() => {
-        if (mutationResult.called && !mutationResult.loading && !mutationResult.error) {
-            console.log("mutationResult");
-            console.log(mutationResult);
-
-            let newFields = mutationResult.data[`update${entity.name}`];
-            console.log("newFields");
-            console.log(newFields);
-            setCurrentEntity(newFields);
-        }
-     }
-    );
-
-
     if (mutationResult.loading) {
         return <div>Loading...</div>
     }
 
-    console.log("currentEntity");
-    console.log(currentEntity);
-
+    const handleInputChange = event => {
+        const { name, value } = event.target;
+        setCurrentEntity({ ...currentEntity, [name]: value });
+    };
 
     let form =  <React.Fragment>
         <a href="./../">← Back to {entity.pluralName}</a>
@@ -61,10 +34,8 @@ const EditForm = props => {
         <form onSubmit={e => {
             e.preventDefault();
 
-            // before submiting serialize compund
-            let serialized = {
-
-            };
+            // before submitting serialize compound
+            let serialized = {};
 
             for (const prop of entity.manualProps.concat(entity.autoProps)) {
                 if (prop.type === "String") {
@@ -75,9 +46,9 @@ const EditForm = props => {
                 }
             }
 
-            serialized.content = content;
-
-            createEntity({ variables: serialized })
+            createEntity({ variables: serialized }).then(result => {
+                setCurrentEntity(result.data[`update${entity.name}`])
+            })
 
         }}>
             <div className="row">
@@ -93,8 +64,6 @@ const EditForm = props => {
                              type="text"
                              className="form-control form-control-user"
                              value={currentEntity[arg.name]}
-                             onChange={handleInputChange}
-                             // placeholder={arg.name}
                             />
                         </div>
                     </div>
@@ -110,16 +79,15 @@ const EditForm = props => {
 
                         {arg.name === "content" ? (
                          <div>
-                          <RichEditor onChange={handleContentChange} content={entityData.content} />
+                          <RichEditor name={arg.name} onChange={handleInputChange} value={entityData.content} />
                          </div>
                         ) : (
                          <input
                           name={arg.type !== "String" ? arg.name + "Id" : arg.name}
                           type="text"
                           className="form-control form-control-user"
-                          value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
                           onChange={handleInputChange}
-                          // placeholder={arg.name}
+                          value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
                          />
                         )}
 
@@ -134,20 +102,14 @@ const EditForm = props => {
         </form>
     </React.Fragment>;
 
-    if (mutationResult.called) {
-        if (!mutationResult.error) {
-            let newFields = mutationResult.data[`update${entity.name}`];
-            console.log("newFields");
-            console.log(newFields);
-            // setCurrentEntity(newFields);
-            return (
-                <React.Fragment>
-                    <div>Successfully updated. </div>
-                    <br />
-                    {form}
-                </React.Fragment>
-            )
-        }
+    if (mutationResult.called && !mutationResult.error) {
+        return (
+         <React.Fragment>
+             <div>Successfully updated. </div>
+             <br />
+             {form}
+         </React.Fragment>
+        )
     }
 
     return (
