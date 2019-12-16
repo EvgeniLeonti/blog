@@ -2,37 +2,24 @@ import React, {useEffect, useState} from 'react'
 import gql from "graphql-tag";
 import {useMutation} from "@apollo/react-hooks";
 
-// import { Editor } from 'react-draft-wysiwyg';
-
-import {convertFromRaw, convertToRaw, EditorState, Editor} from 'draft-js';
-import {
-    inlineToolbarPlugin,
-    toolbarPlugin,
-} from "draft-js-buttons";
-
-import '../../node_modules/draft-js/dist/Draft.css';
-
-
+import RichEditor from './RichEditor';
 
 const EditForm = props => {
     let entity = props.entity;
     let entityData = props.data;
 
 
-    // console.log("parsed");
-    // console.log(convertFromRaw(JSON.parse(entityData.content)))
-
-    let content;
-    const [editorState, setEditorState] = React.useState(
-     EditorState.createWithContent(convertFromRaw(JSON.parse(entityData.content))),
-     // EditorState.createEmpty(),
-    );
+    let content = entityData.content;
 
     const [currentEntity, setCurrentEntity] = useState(entityData);
 
     const handleInputChange = event => {
         const { name, value } = event.target;
         setCurrentEntity({ ...currentEntity, [name]: value });
+    };
+
+    const handleContentChange = strContent => {
+        content = strContent;
     };
 
 
@@ -88,10 +75,7 @@ const EditForm = props => {
                 }
             }
 
-            serialized.content = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
-
-            console.log("serialized");
-            console.log(serialized);
+            serialized.content = content;
 
             createEntity({ variables: serialized })
 
@@ -126,12 +110,7 @@ const EditForm = props => {
 
                         {arg.name === "content" ? (
                          <div>
-                          <Editor
-                           editorState={editorState}
-                           onChange={setEditorState}
-                           plugins={[inlineToolbarPlugin, toolbarPlugin]}
-                          />
-
+                          <RichEditor onChange={handleContentChange} content={entityData.content} />
                          </div>
                         ) : (
                          <input
