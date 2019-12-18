@@ -99,13 +99,16 @@ function Post() {
           });
           html += '</ul>';
           break;
+        case 'code':
+          html += `<div style="background-color: #f0f0f0; padding: 2px">${block.data.code}</div>`;
+          break;
         default:
           console.log('Unknown block type', block.type);
           console.log(block);
           break;
       }
     });
-    return html;
+    return dompurify.sanitize(html);
   };
   
 

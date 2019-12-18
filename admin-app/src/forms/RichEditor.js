@@ -25,15 +25,15 @@ export const EDITOR_JS_TOOLS = {
  paragraph: Paragraph,
  list: List,
  // warning: Warning,
- // code: Code,
+ code: Code,
  // linkTool: LinkTool,
  // image: Image,
  // raw: Raw,
  header: Header,
  // quote: Quote,
  // marker: Marker,
- // checklist: CheckList,
- // delimiter: Delimiter,
+ checklist: CheckList,
+ delimiter: Delimiter,
  // inlineCode: InlineCode,
  // simpleImage: SimpleImage
 };
