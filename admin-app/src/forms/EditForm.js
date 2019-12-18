@@ -28,6 +28,11 @@ const EditForm = props => {
     const handleInputChange = event => {
         const { name, value } = event.target;
         setCurrentEntity({ ...currentEntity, [name]: value });
+        
+        if (name === "content") {
+          console.log("content:")
+          console.log(value)
+        }
     };
 
     let form =  <React.Fragment>
@@ -82,6 +87,7 @@ const EditForm = props => {
 
                         {richEditArgNames.find(argName => argName === arg.name) ? (
                          <div>
+                             {/*<EditorJs data={EDITOR_DATA} tools={EDITOR_JS_TOOLS}/>;*/}
                           <RichEditor name={arg.name} onChange={handleInputChange} value={entityData[arg.name]} />
                          </div>
                         ) : (
