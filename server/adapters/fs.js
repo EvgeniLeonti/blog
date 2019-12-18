@@ -1,31 +1,37 @@
 const fs = require('fs');
 
-const rootPath = "data";
+const DATA_PATH = "data";
+const ENTITIES_PATH = "entities";
 const ERROR = {
   DOESNT_EXIST: "does not exist",
   GENERAL_ERROR: "general error",
 };
 let adapter = {};
 
+
+const entities = fs.readdirSync(ENTITIES_PATH)
+  .map(fileName => fileName.split(".")[0]) // remove the .js extension from filename
+  .filter(className => className !== "Entity") // ignore the abstract class Entity
+  .map(className => require(`../${ENTITIES_PATH}/${className}.js`)[className]);
+
 adapter.init = () => {
-  if (!fs.existsSync(rootPath)) {
-    fs.mkdirSync(`${rootPath}`);
-    fs.mkdirSync(`${rootPath}/authors`);
-    fs.mkdirSync(`${rootPath}/posts`);
+  if (!fs.existsSync(DATA_PATH)) {
+    fs.mkdirSync(`${DATA_PATH}`);
+    entities.forEach(entity => fs.mkdirSync(`${DATA_PATH}/${entity.pluralName.toLowerCase()}`));
   }
   else {
-    if (!fs.existsSync(`${rootPath}/authors`)) {
-      fs.mkdirSync(`${rootPath}/authors`);
-    }
-    if (!fs.existsSync(`${rootPath}/posts`)) {
-      fs.mkdirSync(`${rootPath}/posts`);
-    }
+    entities.forEach(entity => {
+      if (!fs.existsSync(`${DATA_PATH}/${entity.pluralName.toLowerCase()}`)) {
+        fs.mkdirSync(`${DATA_PATH}/${entity.pluralName.toLowerCase()}`)
+  
+      }
+    });
   }
 };
 
 adapter.create = (table, postObject) => {
   // todo validate postObject.id
-  let filePath = `${rootPath}/${table}/${postObject.id}.json`;
+  let filePath = `${DATA_PATH}/${table}/${postObject.id}.json`;
   let write = fs.openSync(filePath, 'w');
   fs.writeFileSync(filePath, JSON.stringify(postObject));
   fs.closeSync(write);
@@ -37,7 +43,7 @@ adapter.create = (table, postObject) => {
 adapter.read = (table, id, sort) => {
   if (id) {
     try {
-      return JSON.parse(fs.readFileSync(`${rootPath}/${table}/${id}.json`).toString());
+      return JSON.parse(fs.readFileSync(`${DATA_PATH}/${table}/${id}.json`).toString());
     }
     catch (e) {
       if (e.code === "ENOENT") {
@@ -48,8 +54,8 @@ adapter.read = (table, id, sort) => {
   }
 
   let entities = [];
-  for (const file of fs.readdirSync(`${rootPath}/${table}`)) {
-    entities.push(JSON.parse(fs.readFileSync(`${rootPath}/${table}/${file}`).toString()));
+  for (const file of fs.readdirSync(`${DATA_PATH}/${table}`)) {
+    entities.push(JSON.parse(fs.readFileSync(`${DATA_PATH}/${table}/${file}`).toString()));
   }
 
   let compareFunctions = [];
@@ -104,7 +110,7 @@ adapter.read = (table, id, sort) => {
 };
 
 adapter.update = (table, postObject) => {
-  let filePath = `${rootPath}/${table}/${postObject.id}.json`;
+  let filePath = `${DATA_PATH}/${table}/${postObject.id}.json`;
   let write = fs.openSync(filePath, 'w');
   fs.writeFileSync(filePath, JSON.stringify(postObject));
   fs.closeSync(write);
@@ -116,7 +122,7 @@ adapter.delete = (table, id) => {
   // read the old object to verify it exists
   let oldPostObject = adapter.read(table, id);
 
-  let filePath = `${rootPath}/${table}/${id}.json`;
+  let filePath = `${DATA_PATH}/${table}/${id}.json`;
   fs.unlinkSync(filePath);
 
   return oldPostObject;
