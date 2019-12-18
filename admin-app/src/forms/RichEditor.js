@@ -1,6 +1,7 @@
 import React from 'react'
 
-import {convertFromRaw, convertToRaw, Editor, EditorState, RichUtils} from 'draft-js';
+import {convertFromRaw, convertToRaw, Editor, EditorState, ContentState, convertFromHTML, RichUtils} from 'draft-js';
+import draftToHtml from 'draftjs-to-html';
 import './RichEditor.css';
 
 class RichEditor extends React.Component {
@@ -8,19 +9,27 @@ class RichEditor extends React.Component {
   super(props);
 
   if (props.value) {
-   this.state = {editorState: EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)))};
+   const blocksFromHTML = convertFromHTML(props.value);
+   const state = ContentState.createFromBlockArray(
+     blocksFromHTML.contentBlocks,
+     blocksFromHTML.entityMap,
+   );
+   this.state = {editorState: EditorState.createWithContent(state)};
   }
   else {
    this.state = {editorState: EditorState.createEmpty()};
   }
-
-  this.focus = () => this.refs.editor.focus();
-  this.onChange = (editorState) => {
-   props.onChange({target: {
-     name: props.name, value: JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-    }});
-   this.setState({editorState})
-  };
+  
+   this.focus = () => this.refs.editor.focus();
+   this.onChange = (editorState) => {
+     let currentContent = convertToRaw(editorState.getCurrentContent());
+     props.onChange({
+       target: {
+         name: props.name, value: draftToHtml(currentContent)
+       }
+     });
+     this.setState({editorState})
+   };
 
   this.handleKeyCommand = (command) => this._handleKeyCommand(command);
   this.onTab = (e) => this._onTab(e);

@@ -9,6 +9,7 @@ const EditForm = props => {
     let entityData = props.data;
 
     let richEditArgNames = ["content"]; // todo server side
+    // let richEditArgNames = []; // todo server side
 
     const [currentEntity, setCurrentEntity] = useState(entityData);
 
