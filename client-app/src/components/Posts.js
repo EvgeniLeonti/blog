@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import {useQuery} from "@apollo/react-hooks";
 import Header from "./Header";
 import Page from "./Page";
+import dompurify from 'dompurify';
 
 
 function Posts() {
@@ -71,12 +72,51 @@ function Post() {
     console.log(data);
 
     let post = data.Post;
+  
+  let convertToHTML = (blocks) => {
+    console.log("blocks");
+    console.log(blocks)
+    
+    let html = '';
+    blocks.forEach(function(block) {
+      switch (block.type) {
+        case 'header':
+          html += `<h${block.data.level}>${block.data.text}</h${block.data.level}>`;
+          break;
+        case 'paragraph':
+          html += `<p>${block.data.text}</p>`;
+          break;
+        case 'delimiter':
+          html += '<hr />';
+          break;
+        case 'image':
+          html += `<img class="img-fluid" src="${block.data.file.url}" title="${block.data.caption}" /><br /><em>${block.data.caption}</em>`;
+          break;
+        case 'list':
+          html += '<ul>';
+          block.data.items.forEach(function(li) {
+            html += `<li>${li}</li>`;
+          });
+          html += '</ul>';
+          break;
+        default:
+          console.log('Unknown block type', block.type);
+          console.log(block);
+          break;
+      }
+    });
+    return html;
+  };
+  
 
+    let editorJSObject = JSON.parse(post.content);
+    
     return (
         <React.Fragment>
             <Header title={post.title} subtitle={post.subtitle} createdAt={post.createdAt} type="post-heading"/>
             <Page>
-                {post.content}
+              <div dangerouslySetInnerHTML={{__html: convertToHTML(editorJSObject.blocks)}} />
+                {/*{convertToHTML(editorJSObject.blocks)}*/}
             </Page>
 
         </React.Fragment>
