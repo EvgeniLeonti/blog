@@ -45,6 +45,9 @@ function App(props) {
   }).join(", ");
 
   entity.mutationVars = mutationVars;
+  
+  let richEditFields =  entity.manualProps.filter(prop => prop.richEdit).map(prop => prop.name);
+  entity.richEditFields = richEditFields;
  }
 
 

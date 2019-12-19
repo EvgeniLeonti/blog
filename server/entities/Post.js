@@ -8,7 +8,7 @@ const manualProps = [
     {name: "author", type: Author.convertToGraphQLType(), fields: ["id", "name"],nonNullForMutation: true},
     {name: "category", type: GraphQLString, nonNullForMutation: false},
     {name: "summary", type: GraphQLString, nonNullForMutation: false},
-    {name: "content", type: GraphQLString, nonNullForMutation: true}
+    {name: "content", type: GraphQLString, nonNullForMutation: true, richEdit: true}
 ];
 
 class Post extends Entity{

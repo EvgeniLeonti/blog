@@ -115,6 +115,7 @@ let clientEntities = entities.map(entity => {
             type: prop.type.name,
             fields: prop.fields,
             nonNullForMutation: prop.nonNullForMutation,
+            richEdit: prop.richEdit
         }
     });
     return {

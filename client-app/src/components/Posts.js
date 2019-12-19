@@ -100,7 +100,10 @@ function Post() {
           html += '</ul>';
           break;
         case 'code':
-          html += `<div style="background-color: #f0f0f0; padding: 2px">${block.data.code}</div>`;
+          html += `<div style="border: 1px solid #f1f1f4; background: #f8f7fa; padding: 2px;  font-size: 12px;
+ font-family: Menlo, Monaco, Consolas, Courier New, monospace">${
+            block.data.code.replace(/(?:\r\n|\r|\n)/g, '<br>')
+          }</div>`;
           break;
         default:
           console.log('Unknown block type', block.type);

@@ -21,7 +21,7 @@ const EntityTable = props => {
          <thead>
          <tr role="row">
           {entityFields.length > 0 ? (
-           entityFields.map(field => (
+            entityFields.filter(field => !entity.richEditFields.find(fieldName => fieldName === field.name)).map(field => (
             <th key={field.name}>{field.name}</th>
            ))
           ) : (
@@ -36,7 +36,7 @@ const EntityTable = props => {
 
            <tr key={entityData.id} role="row" className="odd">
             {entityFields.length > 0 ? (
-             entityFields.map(field => (
+              entityFields.filter(field => !entity.richEditFields.find(fieldName => fieldName === field.name)).map(field => (
               <td key={entityData.id + "_" + field.name}>{typeof entityData[field.name] === "string" ? entityData[field.name] : JSON.stringify(entityData[field.name])}</td>
              ))
             ) : (

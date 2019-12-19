@@ -8,8 +8,7 @@ const EditForm = props => {
     let entity = props.entity;
     let entityData = props.data;
 
-    let richEditArgNames = ["content"]; // todo server side
-    // let richEditArgNames = []; // todo server side
+    let richEditArgNames = entity.richEditFields;
 
     const [currentEntity, setCurrentEntity] = useState(entityData);
 
@@ -59,48 +58,70 @@ const EditForm = props => {
             })
 
         }}>
-            <div className="row">
 
-            {entity.autoProps.length > 0 ? (
-                entity.autoProps.map(arg => (
-                    <div className="col">
-                        <div key={arg.name} className="form-group">
-                            <label>{arg.name}</label>
-                            <input
-                             readOnly
-                             name={arg.name}
-                             type="text"
-                             className="form-control form-control-user"
-                             value={currentEntity[arg.name]}
-                            />
-                        </div>
-                    </div>
-                ))
-            ) : (
-                <td>no fields</td>
-            )}
-            </div>
-            {entity.manualProps.length > 0 ? (
-                entity.manualProps.map(arg => (
-                    <div key={arg.name} className="form-group">
-                        <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
-
-                        {richEditArgNames.find(argName => argName === arg.name) ? (
-                         <div>
-                             {/*<EditorJs data={EDITOR_DATA} tools={EDITOR_JS_TOOLS}/>;*/}
-                          <RichEditor name={arg.name} onChange={handleInputChange} value={entityData[arg.name]} />
-                         </div>
+            <div className="card shadow mb-4 mt-4">
+                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 className="m-0 font-weight-bold text-primary">{entity.name} details</h6>
+                </div>
+                <div className="card-body">
+                    <div className="row">
+                        {entity.autoProps.length > 0 ? (
+                          entity.autoProps.map(arg => (
+                            <div className="col">
+                                <div key={arg.name} className="form-group">
+                                    <label>{arg.name}</label>
+                                    <input
+                                      readOnly
+                                      name={arg.name}
+                                      type="text"
+                                      className="form-control form-control-user"
+                                      value={currentEntity[arg.name]}
+                                    />
+                                </div>
+                            </div>
+                          ))
                         ) : (
-                         <input
-                          name={arg.type !== "String" ? arg.name + "Id" : arg.name}
-                          type="text"
-                          className="form-control form-control-user"
-                          onChange={handleInputChange}
-                          value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
-                         />
+                          <td>no fields</td>
                         )}
-
                     </div>
+                    <div className="row">
+                        {entity.manualProps.length > 0 ? (
+                          entity.manualProps.filter(arg => !richEditArgNames.find(argName => argName === arg.name)).map(arg => (
+                            <div className="col">
+                                <div key={arg.name} className="form-group">
+                                    <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
+        
+                                    <input
+                                      name={arg.type !== "String" ? arg.name + "Id" : arg.name}
+                                      type="text"
+                                      className="form-control form-control-user"
+                                      onChange={handleInputChange}
+                                      value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
+                                    />
+    
+                                </div>
+                            </div>
+                          ))
+                        ) : (
+                          <td>no fields</td>
+                        )}
+                    </div>
+                    
+
+                </div>
+            </div>
+            
+            {entity.manualProps.length > 0 ? (
+                entity.manualProps.filter(arg => richEditArgNames.find(argName => argName === arg.name)).map(arg => (
+                  <div className="card shadow mb-4">
+                      <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                          <h6 className="m-0 font-weight-bold text-primary">{entity.name} {arg.name}</h6>
+                      </div>
+                      <div className="card-body">
+                          {/*<EditorJs data={EDITOR_DATA} tools={EDITOR_JS_TOOLS}/>;*/}
+                          <RichEditor name={arg.name} onChange={handleInputChange} value={entityData[arg.name]} />
+                      </div>
+                  </div>
                 ))
             ) : (
                 <td>no fields</td>
