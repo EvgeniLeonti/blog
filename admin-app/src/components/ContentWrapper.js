@@ -5,7 +5,6 @@ import Sidebar from "./Sidebar";
 const ContentWrapper = props => {
     return (
       <React.Fragment>
-        <Topbar/>
         <div className="full-width">
           <div className="row" id="body-row">
             <div id="sidebar-container" className="d-none d-md-block">

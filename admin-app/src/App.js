@@ -1,10 +1,11 @@
 import React from 'react';
 import './App.css';
-import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom';
-import CRUDRouter from "./components/CRUDRouter"
+import {BrowserRouter as Router, Switch, Route, useRouteMatch} from 'react-router-dom';
 import ContentWrapper from "./components/ContentWrapper";
-import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
+import Add from "./crud/Add";
+import Edit from "./crud/Edit";
+import ReadAll from "./crud/ReadAll";
 
 export const EntitiesContext = React.createContext(undefined);
 
@@ -68,28 +69,49 @@ function App(props) {
  }
  
  
- 
+ function CRUDRouter(props) {
+  
+  const entities = React.useContext(EntitiesContext);
+  let match = useRouteMatch();
+  
+  return (
+    <Switch>
+     <Route path={`${match.path}/:entityName/create`}>
+      <Add entities={entities}/>
+     </Route>
+     <Route path={`${match.path}/:entityName/update/:id`}>
+      <Edit entities={entities}/>
+     </Route>
+     <Route path={`${match.path}/:entityName`}>
+      <ReadAll entities={entities}/>
+     </Route>
+     <Route path={match.path}>
+      <h3>Please select a topic.</h3>
+     </Route>
+    </Switch>
+  );
+ }
  
  return (
    <EntitiesContext.Provider value={entities}>
    <Router>
     
-    
+    <Topbar/>
     
     <Switch>
+     
      <Route exact path='/'>
       <ContentWrapper>
        <p>Welcome</p>
       </ContentWrapper>
      </Route>
+     
      <Route path='/entity'>
- 
-      
       <ContentWrapper>
        <CRUDRouter/>
       </ContentWrapper>
-      
      </Route>
+     
     </Switch>
     
    </Router>

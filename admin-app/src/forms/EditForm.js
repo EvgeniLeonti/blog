@@ -5,12 +5,12 @@ import {useMutation} from "@apollo/react-hooks";
 
 import RichEditor from './RichEditor';
 import CompoundField from "./CompoundField";
-import {EntitiesContext} from "../App";
 
 const EditForm = props => {
     
     let entity = props.entity;
     let entityData = props.data;
+  
 
     let richEditArgNames = entity.richEditFields;
 
@@ -121,7 +121,7 @@ const EditForm = props => {
         <a href="./../">← Back to {entity.pluralName}</a>
         <hr />
         <h1 className="h3 mb-2 text-gray-800">Edit {entity.name}</h1>
-        <form onSubmit={e => {
+        <form id="edit-form" onSubmit={e => {
             e.preventDefault();
             
             // before submitting serialize compound
