@@ -4,6 +4,9 @@ import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom';
 import CRUDRouter from "./components/CRUDRouter"
 import ContentWrapper from "./components/ContentWrapper";
 
+export const EntitiesContext = React.createContext(undefined);
+
+
 function App(props) {
  let entities = props.entities;
 
@@ -21,6 +24,18 @@ function App(props) {
    return prop.name;
   }).join(" ");
   entity.fields = fields;
+ 
+ 
+  let manualFields = entity.manualProps.map(prop => {
+   if (prop.type !== "String") {
+    if (!prop.fields) {
+     return `${prop.name} { id }`;
+    }
+    return `${prop.name} { ${prop.fields.join(" ")} }`
+   }
+   return prop.name;
+  }).join(" ");
+  entity.manualFields = manualFields;
 
 
   let mutationParams = entity.manualProps.map(prop => {
@@ -49,8 +64,10 @@ function App(props) {
   let richEditFields =  entity.manualProps.filter(prop => prop.richEdit).map(prop => prop.name);
   entity.richEditFields = richEditFields;
  }
-
-
+ 
+ 
+ 
+ 
  return (
   <React.Fragment>
    <Router>
@@ -112,7 +129,9 @@ function App(props) {
      </Route>
      <Route path='/entity'>
       <ContentWrapper>
-       <CRUDRouter entities={entities}></CRUDRouter>
+       <EntitiesContext.Provider value={entities}>
+        <CRUDRouter></CRUDRouter>
+       </EntitiesContext.Provider>
       </ContentWrapper>
      </Route>
     </Switch>

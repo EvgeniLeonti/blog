@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactJson from 'react-json-view'
 
 const EntityTable = props => {
  console.log("props of entity table:");
@@ -37,7 +38,14 @@ const EntityTable = props => {
            <tr key={entityData.id} role="row" className="odd">
             {entityFields.length > 0 ? (
               entityFields.filter(field => !entity.richEditFields.find(fieldName => fieldName === field.name)).map(field => (
-              <td key={entityData.id + "_" + field.name}>{typeof entityData[field.name] === "string" ? entityData[field.name] : JSON.stringify(entityData[field.name])}</td>
+              <td key={entityData.id + "_" + field.name}>
+               {
+                typeof entityData[field.name] === "string" ?
+                 entityData[field.name]
+                  :
+                  <ReactJson src={entityData[field.name]} />
+               }
+              </td>
              ))
             ) : (
              <td></td>

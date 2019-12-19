@@ -3,10 +3,12 @@ import { Switch, Route, useRouteMatch } from 'react-router-dom';
 import ReadAll from "../crud/ReadAll";
 import Edit from "../crud/Edit";
 import Add from "../crud/Add";
+import {EntitiesContext} from "../App";
 
 function CRUDRouter(props) {
-    let entities = props.entities;
-    let match = useRouteMatch();
+  
+  const entities = React.useContext(EntitiesContext);
+  let match = useRouteMatch();
 
     return (
         <Switch>

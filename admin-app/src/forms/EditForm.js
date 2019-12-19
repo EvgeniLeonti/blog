@@ -1,10 +1,14 @@
 import React, {useEffect, useState} from 'react'
+
 import gql from "graphql-tag";
 import {useMutation} from "@apollo/react-hooks";
 
 import RichEditor from './RichEditor';
+import CompoundField from "./CompoundField";
+import {EntitiesContext} from "../App";
 
 const EditForm = props => {
+    
     let entity = props.entity;
     let entityData = props.data;
 
@@ -28,10 +32,10 @@ const EditForm = props => {
         const { name, value } = event.target;
         setCurrentEntity({ ...currentEntity, [name]: value });
         
-        if (name === "content") {
+        // if (name === "content") {
           console.log("content:")
           console.log(value)
-        }
+        // }
     };
 
     let form =  <React.Fragment>
@@ -41,6 +45,9 @@ const EditForm = props => {
         <form onSubmit={e => {
             e.preventDefault();
 
+            
+
+            
             // before submitting serialize compound
             let serialized = {};
 
@@ -52,7 +59,10 @@ const EditForm = props => {
                     serialized[`${prop.name}Id`] = currentEntity[prop.name].id;
                 }
             }
-
+    
+            console.log("submit");
+            console.log(serialized);
+            
             createEntity({ variables: serialized }).then(result => {
                 setCurrentEntity(result.data[`update${entity.name}`])
             })
@@ -86,22 +96,36 @@ const EditForm = props => {
                     </div>
                     <div className="row">
                         {entity.manualProps.length > 0 ? (
-                          entity.manualProps.filter(arg => !richEditArgNames.find(argName => argName === arg.name)).map(arg => (
-                            <div className="col">
-                                <div key={arg.name} className="form-group">
-                                    <label>{arg.type !== "String" ? arg.name + "Id" : arg.name}</label>
-        
-                                    <input
-                                      name={arg.type !== "String" ? arg.name + "Id" : arg.name}
-                                      type="text"
-                                      className="form-control form-control-user"
-                                      onChange={handleInputChange}
-                                      value={arg.type !== "String" ? currentEntity[arg.name].id : currentEntity[arg.name]}
-                                    />
-    
+                          entity.manualProps.filter(arg => !richEditArgNames.find(argName => argName === arg.name)).map(arg => {
+                              if (arg.type !== "String") {
+                                  
+                                  return (
+                                    <div className="col">
+                                        <div key={arg.name} className="form-group">
+                                            <label>{arg.name}</label>
+                                            <CompoundField name={arg.name} onChange={handleInputChange} entityName={arg.type} json={currentEntity[arg.name]}/>
+                                        </div>
+                                    </div>
+                                  )
+                              }
+                              
+                              return (
+                                <div className="col">
+                                    <div key={arg.name} className="form-group">
+                                        <label>{arg.name}</label>
+              
+                                        <input
+                                          name={arg.name}
+                                          type="text"
+                                          className="form-control form-control-user"
+                                          onChange={handleInputChange}
+                                          value={currentEntity[arg.name]}
+                                        />
+          
+                                    </div>
                                 </div>
-                            </div>
-                          ))
+                              )
+                          })
                         ) : (
                           <td>no fields</td>
                         )}
