@@ -6,7 +6,7 @@ const Sidebar = (props) => {
   const entities = React.useContext(EntitiesContext);
   
   return (
-    <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion sticky-top sticky-offset" id="accordionSidebar">
     
       {/* Sidebar - Brand */}
       <a className="sidebar-brand d-flex align-items-center justify-content-center" href="/">

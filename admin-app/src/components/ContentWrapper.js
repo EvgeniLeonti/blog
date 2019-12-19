@@ -5,28 +5,16 @@ import Sidebar from "./Sidebar";
 const ContentWrapper = props => {
     return (
       <React.Fragment>
-        <Sidebar/>
-        <div id="content-wrapper" className="d-flex flex-column">
-          <Topbar/>
-          {/* Main Content */}
-          <div id="content">
-            <div className="container-fluid">
+        <Topbar/>
+        <div className="full-width">
+          <div className="row" id="body-row">
+            <div id="sidebar-container" className="d-none d-md-block">
+              <Sidebar/>
+            </div>
+            <div className="col content-padding">
               {props.children}
             </div>
-    
           </div>
-          {/* End of Main Content */}
-    
-          {/* Footer */}
-          <footer className="sticky-footer bg-white">
-            <div className="container my-auto">
-              <div className="copyright text-center my-auto">
-                <span>Copyright &copy; Your Website 2019</span>
-              </div>
-            </div>
-          </footer>
-          {/* End of Footer */}
-  
         </div>
       </React.Fragment>
     )
