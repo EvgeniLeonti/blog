@@ -38,15 +38,91 @@ const EditForm = props => {
         // }
     };
 
+    let autoProps = entity.autoProps.length > 0 ? (
+      entity.autoProps.map(arg => (
+        <div className="col">
+            <div key={arg.name} className="form-group">
+                <label>{arg.name}</label>
+                <input
+                  readOnly
+                  name={arg.name}
+                  type="text"
+                  className="form-control form-control-user"
+                  value={currentEntity[arg.name]}
+                />
+            </div>
+        </div>
+      ))
+    ) : (
+      <td>no fields</td>
+    );
+    
+    let manualProps = entity.manualProps.length > 0 ? (
+      entity.manualProps.filter(arg => !richEditArgNames
+        .find(argName => argName === arg.name))
+        .filter(arg => arg.type === "String")
+        .map(arg => {
+          return (
+            <div className="col-3">
+                <div key={arg.name} className="form-group">
+                    <label>{arg.name}</label>
+                
+                    <input
+                      name={arg.name}
+                      type="text"
+                      className="form-control form-control-user"
+                      onChange={handleInputChange}
+                      value={currentEntity[arg.name]}
+                    />
+            
+                </div>
+            </div>
+          )
+      })
+    ) : (
+      <td>no fields</td>
+    );
+    
+    let manualPropsCompound = entity.manualProps.length > 0 ? (
+      entity.manualProps.filter(arg => !richEditArgNames
+        .find(argName => argName === arg.name))
+        .filter(arg => arg.type !== "String")
+        .map(arg => {
+            return (
+              <div className="col">
+                  <div key={arg.name} className="form-group">
+                      <label>{arg.name}</label>
+                      <CompoundField name={arg.name} onChange={handleInputChange} entityName={arg.type} json={currentEntity[arg.name]}/>
+                  </div>
+              </div>
+            )
+      })
+    ) : (
+      <td>no fields</td>
+    );
+    
+    let manualPropsRichEdit = entity.manualProps.length > 0 ? (
+      entity.manualProps.filter(arg => richEditArgNames.find(argName => argName === arg.name)).map(arg => (
+        <div className="card shadow mb-4">
+            <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 className="m-0 font-weight-bold text-primary">{entity.name} {arg.name}</h6>
+            </div>
+            <div className="card-body">
+                {/*<EditorJs data={EDITOR_DATA} tools={EDITOR_JS_TOOLS}/>;*/}
+                <RichEditor name={arg.name} onChange={handleInputChange} value={entityData[arg.name]} />
+            </div>
+        </div>
+      ))
+    ) : (
+      <td>no fields</td>
+    );
+    
     let form =  <React.Fragment>
         <a href="./../">← Back to {entity.pluralName}</a>
         <hr />
         <h1 className="h3 mb-2 text-gray-800">Edit {entity.name}</h1>
         <form onSubmit={e => {
             e.preventDefault();
-
-            
-
             
             // before submitting serialize compound
             let serialized = {};
@@ -59,10 +135,7 @@ const EditForm = props => {
                     serialized[`${prop.name}Id`] = currentEntity[prop.name].id;
                 }
             }
-    
-            console.log("submit");
-            console.log(serialized);
-            
+
             createEntity({ variables: serialized }).then(result => {
                 setCurrentEntity(result.data[`update${entity.name}`])
             })
@@ -74,82 +147,13 @@ const EditForm = props => {
                     <h6 className="m-0 font-weight-bold text-primary">{entity.name} details</h6>
                 </div>
                 <div className="card-body">
-                    <div className="row">
-                        {entity.autoProps.length > 0 ? (
-                          entity.autoProps.map(arg => (
-                            <div className="col">
-                                <div key={arg.name} className="form-group">
-                                    <label>{arg.name}</label>
-                                    <input
-                                      readOnly
-                                      name={arg.name}
-                                      type="text"
-                                      className="form-control form-control-user"
-                                      value={currentEntity[arg.name]}
-                                    />
-                                </div>
-                            </div>
-                          ))
-                        ) : (
-                          <td>no fields</td>
-                        )}
-                    </div>
-                    <div className="row">
-                        {entity.manualProps.length > 0 ? (
-                          entity.manualProps.filter(arg => !richEditArgNames.find(argName => argName === arg.name)).map(arg => {
-                              if (arg.type !== "String") {
-                                  
-                                  return (
-                                    <div className="col">
-                                        <div key={arg.name} className="form-group">
-                                            <label>{arg.name}</label>
-                                            <CompoundField name={arg.name} onChange={handleInputChange} entityName={arg.type} json={currentEntity[arg.name]}/>
-                                        </div>
-                                    </div>
-                                  )
-                              }
-                              
-                              return (
-                                <div className="col">
-                                    <div key={arg.name} className="form-group">
-                                        <label>{arg.name}</label>
-              
-                                        <input
-                                          name={arg.name}
-                                          type="text"
-                                          className="form-control form-control-user"
-                                          onChange={handleInputChange}
-                                          value={currentEntity[arg.name]}
-                                        />
-          
-                                    </div>
-                                </div>
-                              )
-                          })
-                        ) : (
-                          <td>no fields</td>
-                        )}
-                    </div>
-                    
-
+                    <div className="row">{autoProps}</div>
+                    <div className="row">{manualProps}</div>
+                    <div className="row">{manualPropsCompound}</div>
                 </div>
             </div>
             
-            {entity.manualProps.length > 0 ? (
-                entity.manualProps.filter(arg => richEditArgNames.find(argName => argName === arg.name)).map(arg => (
-                  <div className="card shadow mb-4">
-                      <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                          <h6 className="m-0 font-weight-bold text-primary">{entity.name} {arg.name}</h6>
-                      </div>
-                      <div className="card-body">
-                          {/*<EditorJs data={EDITOR_DATA} tools={EDITOR_JS_TOOLS}/>;*/}
-                          <RichEditor name={arg.name} onChange={handleInputChange} value={entityData[arg.name]} />
-                      </div>
-                  </div>
-                ))
-            ) : (
-                <td>no fields</td>
-            )}
+            {manualPropsRichEdit}
 
 
             <button className="btn btn-primary btn-user btn-block">Update</button>

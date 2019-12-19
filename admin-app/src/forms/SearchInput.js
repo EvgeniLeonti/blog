@@ -13,7 +13,7 @@ const SearchInput = (props) => {
   const READ_ALL_QUERY = gql`
       query {
           all${entity.pluralName} (sort: {createdAt: DESC}) {
-          ${entity.manualFields}
+            id ${entity.manualFields}
       }
       }
   `;
