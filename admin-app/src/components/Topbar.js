@@ -1,6 +1,13 @@
 import React from "react";
 
 const Topbar = (props) => {
+  let customTopbar = <div></div>;
+
+  switch (props.navigation) {
+    case "homepage": customTopbar = <div>homepage</div>; break;
+    case "update": customTopbar = <div><button className="btn btn-primary btn-sm btn-user btn-block" form='edit-form' type="submit">Update</button></div>; break;
+  }
+
   return (
   <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow fixed-top">
     
@@ -22,10 +29,8 @@ const Topbar = (props) => {
         </div>
       </div>
     </form>
-  
-  
-    {/*{<button className="btn btn-sm btn-primary ml-auto mr-3" type="submit" form="edit-form">Update</button>}*/}
-    {props.customTopbar}
+
+    {customTopbar}
     
     {/* Topbar Navbar */}
     <ul className="navbar-nav">

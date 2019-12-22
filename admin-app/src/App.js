@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import {BrowserRouter as Router, Switch, Route, useRouteMatch} from 'react-router-dom';
 import ContentWrapper from "./components/ContentWrapper";
 import Topbar from "./components/Topbar";
-import Add from "./crud/Add";
-import Edit from "./crud/Edit";
-import ReadAll from "./crud/ReadAll";
+import Add from "./pages/Add";
+import Edit from "./pages/Edit";
+import ReadAll from "./pages/ReadAll";
+import Homepage from "./pages/Homepage";
 
 export const EntitiesContext = React.createContext(undefined);
 
@@ -13,6 +14,7 @@ export const EntitiesContext = React.createContext(undefined);
 function App(props) {
  let entities = props.entities;
 
+ const [navigation, setNavigation] = useState("");
 
  // create strings for graphql queries and mutations
  for (const entity of entities) {
@@ -77,13 +79,13 @@ function App(props) {
   return (
     <Switch>
      <Route path={`${match.path}/:entityName/create`}>
-      <Add entities={entities}/>
+      <Add setNavigation={props.setNavigation} entities={entities}/>
      </Route>
      <Route path={`${match.path}/:entityName/update/:id`}>
-      <Edit entities={entities}/>
+      <Edit setNavigation={props.setNavigation} entities={entities}/>
      </Route>
      <Route path={`${match.path}/:entityName`}>
-      <ReadAll entities={entities}/>
+      <ReadAll setNavigation={props.setNavigation} entities={entities}/>
      </Route>
      <Route path={match.path}>
       <h3>Please select a topic.</h3>
@@ -96,19 +98,19 @@ function App(props) {
    <EntitiesContext.Provider value={entities}>
    <Router>
     
-    <Topbar/>
+    <Topbar navigation={navigation}/>
     
     <Switch>
      
      <Route exact path='/'>
       <ContentWrapper>
-       <p>Welcome</p>
+       <Homepage setNavigation={setNavigation}/>
       </ContentWrapper>
      </Route>
      
      <Route path='/entity'>
       <ContentWrapper>
-       <CRUDRouter/>
+       <CRUDRouter setNavigation={setNavigation}/>
       </ContentWrapper>
      </Route>
      

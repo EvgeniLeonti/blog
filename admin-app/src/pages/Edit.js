@@ -3,11 +3,12 @@ import gql from "graphql-tag";
 import {useQuery} from "@apollo/react-hooks";
 import { useParams } from 'react-router-dom';
 import EditForm from "../forms/EditForm";
-
+import CONSTANTS from "../constants";
 
 const Edit = props => {
     let { entityName, id } = useParams();
     let entity = props.entities.find(entity => entity.name === entityName);
+    props.setNavigation(CONSTANTS.NAVIGATION.UPDATE);
 
     const READ_QUERY = gql`
         query {

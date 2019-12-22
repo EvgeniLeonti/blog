@@ -3,10 +3,12 @@ import EntityTable from "../tables/EntityTable";
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import {useParams} from 'react-router-dom';
+import CONSTANTS from "../constants";
 
 function ReadAll(props) {
  let {entityName} = useParams();
  let entity = props.entities.find(entity => entity.name === entityName);
+ props.setNavigation(CONSTANTS.NAVIGATION.READ_ALL);
 
  const READ_ALL_QUERY = gql`
         query {
