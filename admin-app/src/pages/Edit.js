@@ -24,7 +24,8 @@ const Edit = props => {
     if (error) return (<p>Error: {JSON.stringify(error)}</p>);
 
     let entityData = data[entity.name];
-
+    console.log("entityData");
+    console.log(JSON.stringify(entityData));
     return (
         <EditForm entity={entity} data={entityData}/>
     )

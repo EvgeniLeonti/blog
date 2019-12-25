@@ -13,7 +13,7 @@ const CompoundField = (props) => {
   let entity = entities.find(entity => entity.name === props.entityName);
   
   const [currentJSON, setCurrentJSON] = useState(props.json);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(props.isEditing);
   
   
   const onSelect = select => {

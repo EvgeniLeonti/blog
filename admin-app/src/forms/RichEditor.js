@@ -21,45 +21,56 @@ import SimpleImage from '@editorjs/simple-image'
 
 
 export const EDITOR_JS_TOOLS = {
- // table: Table,
- paragraph: Paragraph,
- list: List,
- // warning: Warning,
- code: Code,
- // linkTool: LinkTool,
- // image: Image,
- // raw: Raw,
- header: Header,
- // quote: Quote,
- // marker: Marker,
- checklist: CheckList,
- delimiter: Delimiter,
- // inlineCode: InlineCode,
- // simpleImage: SimpleImage
+    // table: Table,
+    paragraph: Paragraph,
+    list: List,
+    // warning: Warning,
+    code: Code,
+    // linkTool: LinkTool,
+    // image: Image,
+    // raw: Raw,
+    header: Header,
+    // quote: Quote,
+    // marker: Marker,
+    checklist: CheckList,
+    delimiter: Delimiter,
+    // inlineCode: InlineCode,
+    // simpleImage: SimpleImage
 };
 
 
 const RichEditor = (props) => {
- let editorInstance;
-
- 
- return (
-   <EditorJs onChange={() => {
-    if (!editorInstance) {
-     return;
+    let editorInstance;
+    
+    
+    let richEditorInputObject;
+    try {
+        richEditorInputObject = JSON.parse(props.value)
+    } catch (error) {
+        // do nothing
     }
-    editorInstance.save().then((outputData) => {
-     props.onChange({
-      target: {
-       name: props.name, value: JSON.stringify(outputData)
-      }
-     });
-    }).catch((error) => {
-     console.log('Saving failed: ', error)
-    });
-   }} data={JSON.parse(props.value)} tools={EDITOR_JS_TOOLS} instanceRef={instance => editorInstance = instance} />
- )
-
+    
+    console.log("richEditorInputObject:");
+    console.log(richEditorInputObject);
+    
+    
+    return (
+        <EditorJs onChange={() => {
+            if (!editorInstance) {
+                return;
+            }
+            editorInstance.save().then((outputData) => {
+                props.onChange({
+                    target: {
+                        name: props.name, value: JSON.stringify(outputData)
+                    }
+                });
+            }).catch((error) => {
+                console.log('Saving failed: ', error)
+            });
+        }} data={richEditorInputObject} tools={EDITOR_JS_TOOLS} instanceRef={instance => editorInstance = instance}/>
+    )
+    
 };
 
 export default RichEditor;
