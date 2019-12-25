@@ -145,14 +145,17 @@ const EditForm = props => {
                 if (prop.type === "String") {
                     serialized[prop.name] = currentEntity[prop.name];
                 }
-                else {
+                else if(currentEntity[prop.name]) {
                     serialized[`${prop.name}Id`] = currentEntity[prop.name].id;
+                }
+                else {
+                    // todo
+                    console.log("unexpected undefiend value; prop.name:" + prop.name)
                 }
             }
     
-            console.log("on Submit form");
-            console.log("props.isCreate");
-            console.log(props.isCreate);
+            console.log("serialized.content");
+            console.log(serialized.content);
             
             if (props.isCreate) {
                 createEntity({ variables: serialized }).then(result => {
