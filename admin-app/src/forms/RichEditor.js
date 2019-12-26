@@ -47,11 +47,10 @@ const RichEditor = (props) => {
     try {
         richEditorInputObject = JSON.parse(props.value)
     } catch (error) {
-        // do nothing
+        console.log("richEditorInputObject:");
+        console.log(richEditorInputObject);
     }
-    
-    console.log("richEditorInputObject:");
-    console.log(richEditorInputObject);
+
     
     
     return (

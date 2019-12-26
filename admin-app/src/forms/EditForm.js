@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import ReactJson from 'react-json-view'
 
 import gql from "graphql-tag";
 import {useMutation} from "@apollo/react-hooks";
@@ -24,7 +25,7 @@ const EditForm = props => {
         }
         }
     `;
-    const [createEntity, createResult] = useMutation(CREATE_MUTATION);
+    const [createEntity, createResult] = useMutation(CREATE_MUTATION,  { errorPolicy: 'none' });
     
     
     // EDIT
@@ -34,17 +35,31 @@ const EditForm = props => {
                 ${entity.fields}
             }
         }`;
-    const [editEntity, editResult] = useMutation(EDIT_MUTATION);
+    const [editEntity, editResult] = useMutation(EDIT_MUTATION,  { errorPolicy: 'none' });
 
     
     if (editResult.loading || createResult.loading) {
         return <div>Loading...</div>
     }
     if (editResult.error) {
-        return <div>Error: {JSON.stringify(editResult.error)}</div>
+        return (
+            <div>
+                <h1 className="h3 mb-2 text-gray-800">Error</h1>
+                <a href={`../`}>← Back to {entity.pluralName}</a>
+                <hr />
+                <ReactJson src={JSON.parse(JSON.stringify(editResult.error))} />
+            </div>
+        )
     }
     if (createResult.error) {
-        return <div>Error: {JSON.stringify(createResult.error)}</div>
+        return (
+            <div>
+                <h1 className="h3 mb-2 text-gray-800">Error</h1>
+                <a href={`/entity/${entity.name}`}>← Back to {entity.pluralName}</a>
+                <hr />
+                <ReactJson src={JSON.parse(JSON.stringify(createResult.error))} />
+            </div>
+        )
     }
 
     const handleInputChange = event => {
@@ -158,13 +173,20 @@ const EditForm = props => {
             console.log(serialized.content);
             
             if (props.isCreate) {
-                createEntity({ variables: serialized }).then(result => {
-                    setCurrentEntity(result.data[`create${entity.name}`])
-                })
+                createEntity({variables: serialized})
+                    .then(result => {
+                        setCurrentEntity(result.data[`create${entity.name}`])
+                    })
+                    .catch(error => {
+                         // do nothing, handled on if(createResult.error)
+                    })
             }
             else {
-                editEntity({ variables: serialized }).then(result => {
-                    setCurrentEntity(result.data[`update${entity.name}`])
+                editEntity({variables: serialized})
+                    .then(result => {
+                        setCurrentEntity(result.data[`update${entity.name}`])
+                    }).catch(error => {
+                        // do nothing, handled on if(updateResult.error)
                 })
             }
 
@@ -190,14 +212,38 @@ const EditForm = props => {
         </form>
     </React.Fragment>;
 
-    if (editResult.called && !editResult.error) {
-        return (
-         <React.Fragment>
-             <div>Successfully {props.isCreate ? "created" : "updated"}. </div>
-             <br />
-             {form}
-         </React.Fragment>
-        )
+    if (createResult.called) {
+        if (!createResult.error) {
+            return (
+                <React.Fragment>
+                    <div>Successfully created. </div>
+                    <br />
+                    {form}
+                </React.Fragment>
+            )
+        }
+        else {
+            return (
+                <div>error</div>
+            )
+        }
+    }
+    
+    if (editResult.called) {
+        if (!editResult.error) {
+            return (
+                <React.Fragment>
+                    <div>Successfully updated. </div>
+                    <br />
+                    {form}
+                </React.Fragment>
+            )
+        }
+        else {
+            return (
+                <div>error</div>
+            )
+        }
     }
 
     return (

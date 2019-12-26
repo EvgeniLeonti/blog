@@ -24,10 +24,6 @@ const SearchInput = (props) => {
   if (loading) return (<p>Loading entities...</p>);
   if (error) return (<p>Error getting entities: {JSON.stringify(error)}</p>);
   
-  
-  console.log("data:")
-  console.log(data)
-  
   class SearchSuggestions extends React.Component {
     constructor() {
       super();

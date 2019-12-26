@@ -6,7 +6,9 @@ import * as serviceWorker from './serviceWorker';
 
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { HttpLink } from 'apollo-link-http';
+import { HttpLink } from "apollo-link-http";
+import { ErrorLink } from "apollo-link-error";
+import { ApolloLink } from 'apollo-link';
 import { ApolloProvider } from '@apollo/react-hooks';
 import * as axios from 'axios';
 
@@ -15,9 +17,17 @@ const ENTITIES_URL = 'http://localhost:4000/entities';
 
 
 const cache = new InMemoryCache();
-const link = new HttpLink({
+
+const errorLink = new ErrorLink(error => {
+    console.error("GraphQL Error:", error);
+});
+const httpLink = new HttpLink({
     uri: GRAPHQL_URL
 });
+
+
+
+const link = ApolloLink.from([errorLink, httpLink]);
 
 const client = new ApolloClient({
     cache,
@@ -40,7 +50,7 @@ const client = new ApolloClient({
     ReactDOM.render(<div className="text-center">
         <div className="error mx-auto" data-text={error.name}>{error.name}</div>
         <p className="lead text-gray-800 mb-5">{error.message}</p>
-        <p className="text-gray-500 mb-0">It looks like the server isn't running...</p>
+        {/*<p className="text-gray-500 mb-0">It looks like the server isn't running...</p>*/}
         {/*<a href="index.html">← Back to Dashboard</a>*/}
     </div>, document.getElementById('wrapper'))
 
