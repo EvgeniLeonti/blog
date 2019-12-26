@@ -12,7 +12,7 @@ const Add = props => {
  let entityData = {};
  
  return (
-     <EditForm isCreate={true} entity={entity} data={entityData}/>
+     <EditForm isCreate={true} entity={entity}/>
  )
 };
 

@@ -7,15 +7,39 @@ import {useMutation} from "@apollo/react-hooks";
 import RichEditor from './RichEditor';
 import CompoundField from "./CompoundField";
 
+
 const EditForm = props => {
     let entity = props.entity;
     let entityData = props.data;
-  
-
-    let richEditArgNames = entity.richEditFields;
-
-    const [currentEntity, setCurrentEntity] = useState(entityData);
     
+    
+    let richEditArgNames = entity.richEditFields;
+    let getEntityProps = (type, entity) => {
+        if (type === "auto") {
+            return entity.autoProps;
+        }
+        else if (type === "manual-native") {
+            return entity.manualProps
+                .filter(arg => !richEditArgNames.find(argName => argName === arg.name))
+                .filter(arg => arg.type === "String");
+        }
+        else if (type === "manual-compound") {
+            return entity.manualProps
+                .filter(arg => !richEditArgNames.find(argName => argName === arg.name))
+                .filter(arg => arg.type !== "String");
+        }
+        else if (type === "manual-richedit") {
+            return entity.manualProps
+                .filter(arg => richEditArgNames.find(argName => argName === arg.name))
+            
+        }
+        return undefined;
+    };
+    
+
+    
+    const [currentEntity, setCurrentEntity] = useState(entityData);
+
     
     // CREATE
     const CREATE_MUTATION = gql`
@@ -61,41 +85,53 @@ const EditForm = props => {
             </div>
         )
     }
-
+    
+    // create empty instance of entity
+    if (!currentEntity) {
+        entityData = {};
+        for (const prop of getEntityProps("manual-native", entity)) {
+            entityData[prop.name] = '';
+        }
+    
+        console.log("entityData:");
+        console.log(entityData);
+        
+        setCurrentEntity(entityData);
+        return;
+    }
+    
     const handleInputChange = event => {
         const { name, value } = event.target;
         setCurrentEntity({ ...currentEntity, [name]: value });
-        
-        // if (name === "content") {
-          console.log("content:")
-          console.log(value)
-        // }
+    
+        console.log("currentEntity (handleInputChange)");
+        console.log(currentEntity);
     };
     
     
-    let autoProps = entity.autoProps
-        .map(arg => (
-            <div className="col">
-                <div key={arg.name} className="form-group">
-                    <label>{arg.name}</label>
-                    <input
-                        readOnly
-                        name={arg.name}
-                        type="text"
-                        className="form-control form-control-user"
-                        value={currentEntity[arg.name]}
-                    />
+
+    
+    let autoProps;
+    if (!props.isCreate) {
+        autoProps = getEntityProps("auto", entity)
+            .map(arg => (
+                <div className="col">
+                    <div key={arg.name} className="form-group">
+                        <label>{arg.name}</label>
+                        <input
+                            readOnly
+                            name={arg.name}
+                            type="text"
+                            className="form-control form-control-user"
+                            value={currentEntity[arg.name]}
+                        />
+                    </div>
                 </div>
-            </div>
-        ));
-    if (props.isCreate) {
-        autoProps = undefined;
+            ));
     }
     
     
-    let manualProps = entity.manualProps
-        .filter(arg => !richEditArgNames.find(argName => argName === arg.name))
-        .filter(arg => arg.type === "String")
+    let manualProps = getEntityProps("manual-native", entity)
         .map(arg => {
             return (
                 <div className="col-3">
@@ -115,9 +151,7 @@ const EditForm = props => {
             )
         });
     
-    let manualPropsCompound = entity.manualProps
-        .filter(arg => !richEditArgNames.find(argName => argName === arg.name))
-        .filter(arg => arg.type !== "String")
+    let manualPropsCompound = getEntityProps("manual-compound", entity)
         .map(arg => {
             return (
                 <div className="col">
@@ -131,8 +165,7 @@ const EditForm = props => {
         });
     
     
-    let manualPropsRichEdit = entity.manualProps
-        .filter(arg => richEditArgNames.find(argName => argName === arg.name))
+    let manualPropsRichEdit = getEntityProps("manual-richedit", entity)
         .map(arg => (
             <div className="card shadow mb-4">
                 <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -140,7 +173,15 @@ const EditForm = props => {
                 </div>
                 <div className="card-body">
                     <RichEditor name={arg.name} onChange={handleInputChange}
-                                value={!props.isCreate ? entityData[arg.name] : undefined}/>
+                                value={!props.isCreate ? entityData[arg.name] : JSON.stringify({
+                                    "time" : (new Date()).valueOf(),
+                                    "blocks" : [{
+                                        "type" : "paragraph",
+                                        "data" : {
+                                            "text" : "Hey. Meet the new Editor. On this page you can see it in action — try to edit this text."
+                                        }
+                                    },]
+                                })}/>
                 </div>
             </div>
         ));
@@ -156,6 +197,11 @@ const EditForm = props => {
             // before submitting serialize compound
             let serialized = {};
     
+            
+            console.log("currentEntity:");
+            console.log(currentEntity);
+            
+            
             for (const prop of entity.manualProps.concat(entity.autoProps)) {
                 if (prop.type === "String") {
                     serialized[prop.name] = currentEntity[prop.name];
@@ -169,10 +215,11 @@ const EditForm = props => {
                 }
             }
     
-            console.log("serialized.content");
-            console.log(serialized.content);
+            console.log("serialized:");
+            console.log(serialized);
             
             if (props.isCreate) {
+                
                 createEntity({variables: serialized})
                     .then(result => {
                         setCurrentEntity(result.data[`create${entity.name}`])
