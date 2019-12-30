@@ -50,8 +50,6 @@ const RichEditor = (props) => {
         console.log("richEditorInputObject:");
         console.log(richEditorInputObject);
     }
-
-    
     
     return (
         <EditorJs onChange={() => {
