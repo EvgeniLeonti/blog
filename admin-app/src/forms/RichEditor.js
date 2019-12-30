@@ -1,73 +1,41 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
-import EditorJs from 'react-editor-js';
+import { EditorState, ContentState, convertToRaw } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
 
-import Embed from '@editorjs/embed'
-import Table from '@editorjs/table'
-import Paragraph from '@editorjs/paragraph'
-import List from '@editorjs/list'
-import Warning from '@editorjs/warning'
-import Code from '@editorjs/code'
-import LinkTool from '@editorjs/link'
-import Image from '@editorjs/image'
-import Raw from '@editorjs/raw'
-import Header from '@editorjs/header'
-import Quote from '@editorjs/quote'
-import Marker from '@editorjs/marker'
-import CheckList from '@editorjs/checklist'
-import Delimiter from '@editorjs/delimiter'
-import InlineCode from '@editorjs/inline-code'
-import SimpleImage from '@editorjs/simple-image'
-
-
-export const EDITOR_JS_TOOLS = {
-    // table: Table,
-    paragraph: Paragraph,
-    list: List,
-    // warning: Warning,
-    code: Code,
-    // linkTool: LinkTool,
-    // image: Image,
-    // raw: Raw,
-    header: Header,
-    // quote: Quote,
-    // marker: Marker,
-    checklist: CheckList,
-    delimiter: Delimiter,
-    // inlineCode: InlineCode,
-    // simpleImage: SimpleImage
-};
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 
 const RichEditor = (props) => {
-    let editorInstance;
-    
-    
-    let richEditorInputObject;
-    try {
-        richEditorInputObject = JSON.parse(props.value)
-    } catch (error) {
-        console.log("richEditorInputObject:");
-        console.log(richEditorInputObject);
+    let value;
+    if (props.value) {
+        value = props.value;
     }
+    else {
+        value = '<p>Hey this <strong>editor</strong> rocks 😀</p>';
+    }
+    const contentBlock = htmlToDraft(value);
+    
+    const [editorState, setEditorState] = useState(EditorState.createWithContent(ContentState.createFromBlockArray(contentBlock.contentBlocks)));
+    
+    const onEditorStateChange = (editorState) => {
+        setEditorState(editorState);
+    
+        props.onChange({
+            target: {
+                name: props.name,
+                value: draftToHtml(convertToRaw(editorState.getCurrentContent()))
+            }
+        })
+    };
     
     return (
-        <EditorJs onChange={() => {
-            if (!editorInstance) {
-                return;
-            }
-            editorInstance.save().then((outputData) => {
-                props.onChange({
-                    target: {
-                        name: props.name, value: JSON.stringify(outputData)
-                    }
-                });
-            }).catch((error) => {
-                console.log('Saving failed: ', error)
-            });
-        }} data={richEditorInputObject} tools={EDITOR_JS_TOOLS} instanceRef={instance => editorInstance = instance}/>
-    )
-    
+        <Editor
+            editorState={editorState} onEditorStateChange={onEditorStateChange}
+        />
+    );
 };
 
 export default RichEditor;

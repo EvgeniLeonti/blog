@@ -151,16 +151,7 @@ const EditForm = props => {
                     <h6 className="m-0 font-weight-bold text-primary">{entity.name} {arg.name}</h6>
                 </div>
                 <div className="card-body">
-                    <RichEditor name={arg.name} onChange={handleInputChange}
-                                value={!props.isCreate ? entityData[arg.name] : JSON.stringify({
-                                    "time" : (new Date()).valueOf(),
-                                    "blocks" : [{
-                                        "type" : "paragraph",
-                                        "data" : {
-                                            "text" : "Hey. Meet the new Editor. On this page you can see it in action — try to edit this text."
-                                        }
-                                    },]
-                                })}/>
+                    <RichEditor name={arg.name} onChange={handleInputChange} value={props.isCreate ? undefined : entityData[arg.name]}/>
                 </div>
             </div>
         ));
